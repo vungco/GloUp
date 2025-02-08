@@ -441,3 +441,33 @@ h5 {
 .news img {
   width: 100%;
 }
+
+/* pay */
+.contact_in4 {
+  position: relative;
+  padding: 2;
+  border: 1px solid #989696;
+  border-radius: 3px;
+  width: 80%;
+  height: 40px;
+  margin-top: 20px;
+}
+
+.contact_in4 input,
+.contact_in4 select {
+  width: 100%;
+  outline: none;
+  border: none;
+  height: 35px;
+
+
+}
+
+.contact_in4 p {
+  position: absolute;
+  top: -40%;
+  left: 10%;
+  background-color: #fff;
+  padding: 4px;
+  color: rgb(214, 156, 82);
+}

@@ -4,7 +4,7 @@ function User({ children }) {
     return (
         <div >
             <Header />
-            <div className="">{children}</div>
+            <div className="" style={{ marginTop: '80px' }}>{children}</div>
             <Footer />
         </div>
     );

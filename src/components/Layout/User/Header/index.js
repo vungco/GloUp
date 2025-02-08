@@ -42,7 +42,7 @@ function Header() {
                         </div>
                         <div className="col-md-4"></div>
                         <div className="col-md-1">
-                            <Link to="/home">
+                            <Link to="/">
                                 <img className="img-fluid" src="https://file.hstatic.net/200000259653/file/logo_f70542ec0f67426aa376166ef30_cb58b01f399a4e51a49015f5e0862dea.png" alt="" />
                             </Link>
                         </div>
@@ -54,7 +54,7 @@ function Header() {
                             </div>
                             <div className="col-md-3">
                                 <div className="cart-icon">
-                                    <Link to="/product">
+                                    <Link to="/Cart">
                                         <i className="fa-solid fa-cart-shopping"></i>
                                     </Link>
                                     <span className="cart-badge">10</span>
@@ -70,15 +70,15 @@ function Header() {
             <div className={`sidebar ${menuActive ? 'active' : ''}`}>
                 <span className="close-btn" onClick={toggleMenu}>&times;</span>
                 <div className="mt-4">
-                    <Link to="/home">Trang chủ</Link>
-                    <Link to="/all-products">Tất cả sản phẩm</Link>
+                    <Link to="/">Trang chủ</Link>
+                    <Link to="/Product">Tất cả sản phẩm</Link>
                     <Link to="/makeup">Trang điểm</Link>
                     <Link to="/skincare">Chăm sóc da</Link>
                     <Link to="/lipstick">Son môi</Link>
                     <Link to="/hair-care">Chăm sóc tóc</Link>
-                    <Link to="/news">Tin tức</Link>
-                    <Link to="/about">Giới thiệu</Link>
-                    <Link to="/contact">Liên hệ</Link>
+                    <Link to="/News">Tin tức</Link>
+                    <Link to="/About">Giới thiệu</Link>
+                    <Link to="/Contact">Liên hệ</Link>
                 </div>
                 <p>Nhận bản tin mới nhất và hỗ trợ từ chúng tôi</p>
                 <div className="d-flex">
