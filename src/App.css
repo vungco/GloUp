@@ -54,7 +54,6 @@ header {
 .header {
   height: 80px;
   color: #926625;
-
 }
 
 .header a {
@@ -94,7 +93,7 @@ header {
   /* Ẩn menu ban đầu */
   width: 300px;
   height: 100%;
-  background: #F8D5D7;
+  background: #f8d5d7;
   color: #926625;
   transition: left 0.8s ease-in-out;
   padding: 20px;
@@ -147,7 +146,6 @@ header {
   font-size: 24px;
   cursor: pointer;
   color: #926625;
-
 }
 
 .overlay,
@@ -159,7 +157,7 @@ header {
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   /* Màu đen mờ */
-  z-index: 1000;
+  z-index: 1;
   opacity: 0;
   visibility: hidden;
   transition: opacity 1s ease-in-out;
@@ -204,7 +202,6 @@ header {
   margin-top: 16px;
 }
 
-
 .form-login a,
 .form-login label {
   font-size: 12px;
@@ -214,7 +211,7 @@ header {
 
 .form-login button {
   border: none;
-  background-color: #F8D5D7;
+  background-color: #f8d5d7;
   width: 70%;
   height: 36px;
   color: #926625;
@@ -226,7 +223,8 @@ header {
   height: 450px;
   position: relative;
 
-  background: url('https://file.hstatic.net/200000259653/file/2_9e320845e270473dbd46a77cb21c6608.jpeg') no-repeat center center;
+  background: url("https://file.hstatic.net/200000259653/file/2_9e320845e270473dbd46a77cb21c6608.jpeg")
+    no-repeat center center;
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -252,7 +250,6 @@ header {
 
 .form-login_banner .content button:hover {
   background: #926625;
-
 }
 
 .form-login form button:hover {
@@ -271,7 +268,7 @@ h5 {
   left: 0;
   width: 50px;
   height: 50px;
-  background-image: url('https://file.hstatic.net/200000259653/file/pages_17a8568517e94dcd9c8aec5587_570924d1fa4b4da1aa011044c9d7cc1c.png');
+  background-image: url("https://file.hstatic.net/200000259653/file/pages_17a8568517e94dcd9c8aec5587_570924d1fa4b4da1aa011044c9d7cc1c.png");
   background-size: cover;
   animation: animationSnow 6s ease-in-out infinite;
 }
@@ -306,12 +303,11 @@ h5 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
 }
 
 .ld p {
   font-size: 50px;
-  font-family: 'Dancing Script', cursive;
+  font-family: "Dancing Script", cursive;
 }
 
 .ld button {
@@ -324,13 +320,11 @@ h5 {
 }
 
 .ld button:hover {
-
   border: none;
   background: #926625;
 
   color: #fff;
 }
-
 
 .main-trademark_title p:nth-child(1) {
   text-align: center;
@@ -347,8 +341,8 @@ h5 {
 .main-sellwell_product {
   height: 600px;
 
-
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(0, 0, 0, 0.1), 4px -4px 10px rgba(0, 0, 0, 0.1), -4px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(0, 0, 0, 0.1),
+    4px -4px 10px rgba(0, 0, 0, 0.1), -4px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .main-sellwell_product img {
@@ -365,7 +359,7 @@ h5 {
 
 .product-card:hover {
   transform: scale(1.05);
-  border: 1px solid #F8D5D7;
+  border: 1px solid #f8d5d7;
   cursor: pointer;
 }
 
@@ -391,7 +385,7 @@ h5 {
   color: white;
   padding: 10px;
   border-radius: 50%;
-  background-color: #F8D5D7;
+  background-color: #f8d5d7;
   cursor: pointer;
   transition: background-color 0.3s;
 }
@@ -400,8 +394,6 @@ h5 {
 .product-icons i:hover {
   background-color: red;
 }
-
-
 
 .product-card img {
   height: 70%;
@@ -434,7 +426,7 @@ h5 {
 }
 
 .news:hover {
-  color: #F8D5D7;
+  color: #f8d5d7;
   cursor: pointer;
 }
 
@@ -459,8 +451,6 @@ h5 {
   outline: none;
   border: none;
   height: 35px;
-
-
 }
 
 .contact_in4 p {

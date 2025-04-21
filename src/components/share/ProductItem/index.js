@@ -9,7 +9,6 @@ const ProductItem = ({ imgSrc, name, price }) => {
     };
     return (
         <div>
-
             <div className="product-card">
                 <img src={imgSrc} alt="Sản phẩm 1" />
                 <p>{name}</p>
