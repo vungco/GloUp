@@ -17,7 +17,7 @@ class CheckRole
   public function handle(Request $request, Closure $next): Response
   {
     $user = Auth::user();
-    if ($user->user_role == 'admin') {
+    if ($user->role == 'admin') {
       return $next($request);
     }
     return response()->json(['message' => 'Forbidden'], 403);

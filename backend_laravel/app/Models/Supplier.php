@@ -12,7 +12,7 @@ class Supplier extends Model
     'phone',
     'address',
   ];
-
+  public $timestamps  = false;
   public function products()
   {
     return $this->hasMany(Product::class);

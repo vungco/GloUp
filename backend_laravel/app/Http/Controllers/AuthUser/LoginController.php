@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
-  public function User_Login(Request $request)
+  public function login(Request $request)
   {
-    $user_email = $request->user_email;
-    $user_password = $request->user_password;
+    $email = $request->email;
+    $password = $request->password;
 
-    $status = Auth::attempt(['user_email' => $user_email, 'password' => $user_password]);
+    $status = Auth::attempt(['email' => $email, 'password' => $password]);
 
     if ($status) {
       $user = Auth::user();
@@ -25,9 +25,9 @@ class LoginController extends Controller
       return response()->json([
         'message' => 'đăng nhập thành công',
         'user' => [
-          'user_id' => $user->user_id,
-          'user_role' => $user->user_role,
-          'user_name' => $user->user_name,
+          'id' => $user->id,
+          'role' => $user->role,
+          'name' => $user->name,
         ],
         'token' => $token->plainTextToken,
       ]);
@@ -37,7 +37,7 @@ class LoginController extends Controller
     ], 401);
   }
 
-  public function ShowProfile(Request $request)
+  public function showProfile(Request $request)
   {
     return response()->json(
       [

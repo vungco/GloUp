@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -41,7 +42,7 @@ class SupplierController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(SupplierRequest $request)
   {
     $get_supplier = Supplier::create($request->all());
 
@@ -72,7 +73,7 @@ class SupplierController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Supplier $supplier)
+  public function update(SupplierRequest $request, Supplier $supplier)
   {
     $supplier->update($request->all());
 

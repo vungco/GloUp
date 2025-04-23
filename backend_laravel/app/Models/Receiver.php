@@ -16,7 +16,7 @@ class Receiver extends Model
     'type',
     'dsc',
   ];
-
+  public $timestamps  = false;
   public function user()
   {
     return $this->belongsTo(User::class);

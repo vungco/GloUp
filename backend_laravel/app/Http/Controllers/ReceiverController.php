@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReceiverRequest;
 use App\Models\Receiver;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class ReceiverController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(ReceiverRequest $request)
   {
     $receiver = Receiver::create($request->all());
 
@@ -73,7 +74,7 @@ class ReceiverController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Receiver $receiver)
+  public function update(ReceiverRequest $request, Receiver $receiver)
   {
     $receiver->update($request->all());
 

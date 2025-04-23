@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 
 // 1. Không cần xác thực
-Route::post('user/login', [LoginController::class, 'User_Login']);
+Route::post('user/login', [LoginController::class, 'login']);
 Route::post('user/register', [RegisterController::class, 'User_Register']);
 
 // 2. Cần xác thực
@@ -38,9 +38,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
   // 3. Admin-only
   Route::middleware('admin')->group(function () {
-    Route::apiResource('users', UserController::class)->only(['store']);
-    Route::apiResource('categories', CategoryController::class)->only(['store', 'update', 'destroy']);
-    Route::apiResource('products', ProductController::class)->only(['store', 'update', 'destroy']);
-    Route::apiResource('suppliers', SupplierController::class)->only(['store', 'update', 'destroy']);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('products', ProductController::class);
+    Route::apiResource('suppliers', SupplierController::class);
   });
 });
