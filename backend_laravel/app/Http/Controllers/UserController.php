@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use App\Models\Receiver;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -85,23 +86,9 @@ class UserController extends Controller
     );
   }
 
-  public function HandleCart(User $user)
+  public function ShowReceivers(Request $request)
   {
-    $get_cart = $user->carts()->with('product')->get();
-    $count_cart = $user->carts()->count('id');
-
-    return response()->json(
-      [
-        "message" => "đã lấy dữ liệu thành công",
-        "data" => $get_cart,
-        "count_cart" => $count_cart,
-      ]
-    );
-  }
-
-  public function ShowReceivers(User $user)
-  {
-    $get_receivers = $user->receivers()->orderBy('receiver_type', 'desc')->get();
+    $get_receivers = $request->user()->receivers()->orderBy('type', 'desc')->get();
 
     if (count($get_receivers) > 0) {
       return response()->json(
@@ -120,9 +107,9 @@ class UserController extends Controller
     }
   }
 
-  public function showByType(User $user)
+  public function showByType(Request $request)
   {
-    $get_receivers = $user->receivers()->where('receiver_type', 1)->get();
+    $get_receivers = $request->user()->receivers()->where('type', 1)->get();
     // $receiver= Receiver::where('receiver_type',1)->get();
 
     if (count($get_receivers) > 0) {
@@ -140,5 +127,19 @@ class UserController extends Controller
         404
       );
     }
+  }
+
+  public function setType(Request $request, Receiver $receiver)
+  {
+    $request->user()->receivers()->where('type', 1)->update(["type" => 0]);
+    $receiver->update(["type" => 1]);
+
+
+    return response()->json(
+      [
+        "message" => "đã update thành công",
+        "data" => $receiver,
+      ]
+    );
   }
 }

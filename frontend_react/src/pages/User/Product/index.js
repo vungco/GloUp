@@ -21,7 +21,7 @@ function Product() {
         console.log(response.data);
       })
       .catch((error) => {
-        console.error("có lỗi trong quá trình lấy dl: " + error);
+        console.error(error);
       });
   }, []);
 

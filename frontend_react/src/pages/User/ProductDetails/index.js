@@ -64,7 +64,6 @@ function ProductDetails() {
   };
 
   function addToCart() {
-    alert("ok");
     const user_id = getUser_id();
     const data = {
       user_id,

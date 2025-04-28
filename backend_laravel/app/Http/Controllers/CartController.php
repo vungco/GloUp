@@ -30,7 +30,7 @@ class CartController extends Controller
     $user = $request->user();
     $cart = $user->carts()->where('product_id', $request->product_id)->first();
     if ($cart) {
-      $newquantity = $request->cart_quantity + $cart->cart_quantity;
+      $newquantity = $request->quantity + $cart->quantity;
       $cart->update(['quantity' => $newquantity]);
 
       return response()->json(
@@ -98,6 +98,41 @@ class CartController extends Controller
       [
         "message" => "đã xóa thành công",
         "data" => $cart,
+      ]
+    );
+  }
+
+  public function showCartByUser(Request $request)
+  {
+
+    $carts = $request->user()->carts()->with('product')->get();
+
+    return response()->json(
+      [
+        "message" => "đã lấy dl thành công",
+        "data" => $carts,
+      ]
+    );
+  }
+
+
+  public function showCartByUserSelect(Request $request)
+  {
+    // Lấy danh sách `cart_ids` từ request
+    $cartIds = $request->input('cart_ids');
+
+    // Kiểm tra xem `cart_ids` có hợp lệ không
+    if (empty($cartIds)) {
+      return response()->json(['error' => 'cart_ids is required'], 400);
+    }
+
+    // Truy vấn tất cả các giỏ hàng theo `cart_ids`
+    $carts = Cart::whereIn('id', $cartIds)->with('product')->get();
+
+    return response()->json(
+      [
+        "message" => "đã lấy dl thành công",
+        "data" => $carts,
       ]
     );
   }

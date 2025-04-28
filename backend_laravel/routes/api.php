@@ -29,18 +29,23 @@ Route::middleware('auth:sanctum')->group(function () {
 
   // Giỏ hàng & người nhận
   Route::apiResource('carts', CartController::class);
+  Route::get('user/carts', [CartController::class, 'showCartByUser']);
+  Route::get('user/select_cart', [CartController::class, 'showCartByUserSelect']);
+
+
   Route::apiResource('receivers', ReceiverController::class);
-  Route::get('users/{user}/receivers', [UserController::class, 'ShowReceivers']);
-  Route::get('users/{user}/receivers/type', [UserController::class, 'showByType']);
+  Route::get('user/receivers', [UserController::class, 'ShowReceivers']);
+  Route::get('receiver/type', [UserController::class, 'showByType']);
+  Route::get('receiver/{receiver}/setType', [UserController::class, 'setType']);
 
   // Logout
   Route::get('user/logout', [LogoutController::class, 'User_Logout']);
 
   // 3. Admin-only
   Route::middleware('admin')->group(function () {
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('products', ProductController::class);
-    Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('users', UserController::class)->only(['store', 'update', 'delete']);
+    Route::apiResource('categories', CategoryController::class)->only(['store', 'update', 'delete']);
+    Route::apiResource('products', ProductController::class)->only(['store', 'update', 'delete']);
+    Route::apiResource('suppliers', SupplierController::class)->only(['store', 'update', 'delete']);
   });
 });

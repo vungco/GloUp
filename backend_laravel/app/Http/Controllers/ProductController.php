@@ -90,7 +90,12 @@ class ProductController extends Controller
    */
   public function show(Product $product)
   {
-    //
+    return response()->json(
+      [
+        "message" => "đã lấy dữ liệu thành công",
+        'data' => $product,
+      ]
+    );
   }
 
   /**

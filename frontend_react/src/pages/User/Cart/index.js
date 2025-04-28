@@ -7,7 +7,7 @@ import { pathUrl } from "../../../utils/path";
 function Cart() {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
-  const [carts, setcarts] = useState(null);
+  const [carts, setcarts] = useState([]);
   const [purchase_quantity, setpurchase_quantity] = useState(null);
   const [totalmoney, settotalmoney] = useState(null);
   const [selectCarts, setselectCarts] = useState([]);

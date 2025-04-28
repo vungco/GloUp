@@ -34,7 +34,7 @@ createAppKit({
   adapters: [new EthersAdapter()],
   networks: [sepolia],
   metadata,
-  projectId,
+  // projectId,
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
   },
