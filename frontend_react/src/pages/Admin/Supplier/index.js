@@ -1,119 +1,116 @@
-
-import React, { useState ,useEffect } from 'react';
-import SupplierForm from './SupplierForm';
-import axios from 'axios';
-import { apiUrl } from '../../../config';
-
+import React, { useEffect, useState } from "react";
+import supplierApi from "../../../api/supplierApi";
+import CreateForm from "./create";
+import EditForm from "./edit";
 
 function Supplier() {
+  const [suppliers, setsuppliers] = useState(null);
+  const [isShowFormCreate, setisShowFormCreate] = useState(false);
+  const [isShowFormEdit, setisShowFormEdit] = useState(false);
 
-    const [selectedSupplierId, setSelectedSupplierId] = useState(null);
+  useEffect(() => {
+    Getsuppliers();
+  }, []);
 
-    // gọi api
-    const [data, setData] = useState([]);
-    // const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        axios.get(`${apiUrl}/api/suppliers`)
-            .then(response => {
-                // Truy cập vào phần "data" của API trả về và đặt vào state
-                setData(response.data.data);
-            })
-            .catch(error => {
-                console.error('Error fetching data: ', error);
-            });
-    }, []);
+  function Getsuppliers() {
+    supplierApi
+      .getAll()
+      .then((response) => {
+        setsuppliers(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
-
-    // Cập nhật danh sách nhà cung cấp sau khi thêm hoặc sửa
-    const updateSuppliers = () => {
-        axios.get(`${apiUrl}/api/suppliers`)
-        .then(response => {
-            setData(response.data.data);
+  function Deletetable(id) {
+    let getconfirm = window.confirm(
+      "bạn có thực sự muốn xóa nhà cung cấp này không ?"
+    );
+    if (getconfirm) {
+      supplierApi
+        .delete(id)
+        .then((response) => {
+          alert("bạn đã xóa nhà cung cấp thành công");
+          Getsuppliers();
         })
-        .catch(error => {
-            console.error('Có lỗi khi cập nhật danh sách nhà cung cấp!');
+        .catch((error) => {
+          console.error(error);
         });
-    };
+    }
+  }
 
-    const [isFormVisible, setIsFormVisible] = useState(false);
+  return (
+    <div className="container mt-3 ">
+      <div className="d-flex justify-content-between mb-3">
+        <button
+          className="btn btn-primary"
+          onClick={() => setisShowFormCreate(true)}
+        >
+          <i className="fa fa-plus"></i> Thêm
+        </button>
+        {isShowFormCreate && (
+          <CreateForm
+            setisShowFormCreate={setisShowFormCreate}
+            Getsuppliers={Getsuppliers}
+          />
+        )}
+      </div>
+      <table className="table table-bordered table-hover">
+        <thead className="table-dark">
+          <tr>
+            <th>Tên nhà cung cấp</th>
 
-    const openForm = (supplierId = null) => {
-        setSelectedSupplierId(supplierId);
-        setIsFormVisible(true);
-      };
-    
-      // Đóng form
-      const closeForm = () => {
-        setIsFormVisible(false);
-      };
-    //   xóa
-    const deleteSupplier = (supplierId) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa nhà cung cấp này không?')) {
-          axios.delete(`${apiUrl}/api/suppliers/${supplierId}`)
-            .then(response => {
-                updateSuppliers(); // Cập nhật lại danh sách sau khi xóa
-            })
-        }
-      };
-    return ( 
-        <div style={{backgroundColor:'#fff',minHeight:'100vh',paddingLeft:'4px'}}>
-            <div className="container supplier pt-3">
-                <button type="button" class="btn btn-success " onClick={() => openForm()}>Thêm</button>
-                {isFormVisible && (
-                    <>
-                    <div className="overlay"></div> {/* Lớp overlay */}
-                    {isFormVisible && (
-                    <SupplierForm 
-                    supplierId={selectedSupplierId} 
-                    onUpdate={updateSuppliers} 
-                    onClose={closeForm} 
+            <th>Email nhà cung cấp</th>
+            <th>Số điện thoại nhà cung cấp</th>
+            <th>Địa chỉ nhà cung cấp</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {suppliers?.map((supplier) => (
+            <tr key={supplier.id}>
+              <td>{supplier.name}</td>
+              <td>{supplier.email}</td>
+              <td>{supplier.phone}</td>
+              <td>{supplier.address}</td>
+
+              <td>
+                <button
+                  className="btn btn-warning btn-sm me-2"
+                  onClick={() => setisShowFormEdit(supplier)}
+                >
+                  <i className="fa fa-edit"></i> Sửa
+                </button>
+
+                {isShowFormEdit.id == supplier.id && (
+                  <>
+                    <EditForm
+                      setisShowFormEdit={setisShowFormEdit}
+                      Getsuppliers={Getsuppliers}
+                      data={{
+                        name: supplier.name,
+                        email: supplier.email,
+                        phone: supplier.phone,
+                        address: supplier.address,
+                      }}
+                      id={supplier.id}
                     />
-      )}
-                    </>
+                  </>
                 )}
-            </div>
-
-            <div className='container pt-4'>
-                <table className="table table-striped">
-                    <thead>
-                        <tr>
-                        <th>Tên nhà cung cấp</th>
-                        <th>Địa chỉ</th>
-                        <th>Email</th>
-                        <th>SĐT</th>
-                        <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* {suppliers.map((supplier, index) => (key={index} */}
-                        {data.map(item => (
-                        <tr key={item.id}>
-                            <td >{item.supplier_name}</td>
-                            
-                            <td>{item.supplier_address}</td>
-                            <td>{item.supplier_email}</td>
-                            <td>{item.supplier_phone}</td>
-                            <td>
-                            <button 
-                                className="btn btn-warning btn-sm mr-2" 
-                                onClick={() => openForm(item.supplier_id)}
-                            >
-                                Sửa
-                            </button>
-                            <button 
-                                className="btn btn-danger btn-sm" 
-                                onClick={() => deleteSupplier(item.supplier_id)}
-                            >
-                                Xóa
-                            </button>
-                            </td>
-                        </tr>))}
-                        {/* ))} */}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-     );
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => Deletetable(supplier.id)}
+                >
+                  <i className="fa fa-trash"></i> Xóa
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default Supplier;

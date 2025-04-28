@@ -2,27 +2,33 @@ import axiosClient from "../utils/axiosClient";
 
 const receiverApi = {
   getAll(params) {
-    return axiosClient.get("/carts", { params });
+    return axiosClient.get("/receivers", { params });
   },
 
   getById(id) {
-    return axiosClient.get(`/carts/${id}`);
+    return axiosClient.get(`/receivers/${id}`);
   },
 
-  getByIdUser(id) {
-    return axiosClient.get(`/user/get_customer`);
+  getReceiversByUser() {
+    return axiosClient.get(`/user/receivers`);
+  },
+  getReceiverDefault() {
+    return axiosClient.get(`/receiver/type`);
   },
 
   create(data) {
-    return axiosClient.post("/carts", data);
+    return axiosClient.post("/receivers", data);
   },
 
   update(id, data) {
-    return axiosClient.put(`/carts/${id}`, data);
+    return axiosClient.put(`/receivers/${id}`, data);
   },
 
   delete(id) {
-    return axiosClient.delete(`/carts/${id}`);
+    return axiosClient.delete(`/receivers/${id}`);
+  },
+  setTypeByReceiver(id) {
+    return axiosClient.get(`/receiver/${id}/setType`);
   },
 
   getprovinces() {

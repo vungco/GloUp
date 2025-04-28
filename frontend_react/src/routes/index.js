@@ -9,6 +9,13 @@ import Contact from "../pages/User/Contact";
 import About from "../pages/User/About";
 import Receiver from "../pages/User/Receiver";
 import Thankyou from "../pages/User/Thankyou";
+import AdHome from "../pages/Admin/Home";
+import admin from "../components/Layout/Admin";
+import User from "../pages/Admin/User";
+import Category from "../pages/Admin/Category";
+import Supplier from "../pages/Admin/Supplier";
+import AdProduct from "../pages/Admin/Product";
+import AdReceiver from "../pages/Admin/Receiver";
 
 const publicRoutes = [
   {
@@ -20,7 +27,7 @@ const publicRoutes = [
     component: Product,
   },
   {
-    path: "/ProductDetails",
+    path: "/ProductDetail/:id",
     component: ProductDetails,
   },
   {
@@ -50,6 +57,36 @@ const publicRoutes = [
   {
     path: "/Thankyou",
     component: Thankyou,
+  },
+  {
+    path: "/Admin/Home",
+    component: AdHome,
+    layout: admin,
+  },
+  {
+    path: "/Admin/User",
+    component: User,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Category",
+    component: Category,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Supplier",
+    component: Supplier,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Product",
+    component: AdProduct,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Receiver",
+    component: AdReceiver,
+    layout: admin,
   },
 ];
 

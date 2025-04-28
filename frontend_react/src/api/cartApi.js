@@ -10,7 +10,10 @@ const cartApi = {
   },
 
   getByIdUser(id) {
-    return axiosClient.get(`/user/get_customer`);
+    return axiosClient.get(`/user/carts`);
+  },
+  getBySelectCart(params) {
+    return axiosClient.get("/user/select_cart", { params });
   },
 
   create(data) {

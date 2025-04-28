@@ -1,152 +1,83 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import cartApi from "../../../api/cartApi";
+import { useState, useEffect } from "react";
+import Pay from "./Pay";
+import Loading from "../../../utils/load";
+import {
+  BrowserProvider,
+  JsonRpcProvider,
+  Contract,
+  InfuraProvider,
+} from "ethers";
+import { createAppKit, useAppKitProvider } from "@reown/appkit/react";
+import { EthersAdapter } from "@reown/appkit-adapter-ethers";
+import { arbitrum, sepolia } from "@reown/appkit/networks";
+import { VITE_WALLETCONNECT_ID } from "../../../config";
 
-function Pay() {
-  const navigate = useNavigate();
+// 1. Get projectId
+const projectId = "cdeca023a782de9f15347300de49a66";
 
-  const handleToThanks = () => {
-    navigate("/Thankyou"); // Chuyển đến trang Pay
-  };
-  return (
-    <div>
-      <div className="container-fluid" style={{ background: "#F8D5D7" }}>
-        <div
-          className="container d-flex align-items-center"
-          style={{ height: "50px" }}
-        >
-          <p className="m-0" style={{ color: "#fff" }}>
-            Trang chủ /{" "}
-          </p>
-          <p className="m-0" style={{ color: "#d69c52" }}>
-            {" "}
-            Thông tin đơn hàng
-          </p>
-        </div>
-      </div>
+// 2. Set the networks
+// const networks = [arbitrum, sepolia];
 
-      <div className="container  pt-5 pb-5">
-        <div className="row">
-          <div className="col-md-4">
-            <h5>Thông tin nhận hàng</h5>
-            <div className="mt-3">
-              <div className="contact_in4">
-                <input />
-                <p>Họ và tên</p>
-              </div>
-              <div className="contact_in4">
-                <input />
-                <p>Số điện thoại</p>
-              </div>
-              <div className="contact_in4">
-                <input />
-                <p>Địa chỉ cụ thể</p>
-              </div>
-              <div className="contact_in4">
-                <select>
-                  <option></option>
-                </select>
-                <p>Chọn tỉnh</p>
-              </div>
-              <div className="contact_in4">
-                <select>
-                  <option></option>
-                </select>
-                <p>Chọn huyện</p>
-              </div>
-              <div className="contact_in4">
-                <select>
-                  <option></option>
-                </select>
-                <p>Chọn xã</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div>
-              <h5>Thanh toán</h5>
-              <div
-                className="d-flex align-items-center justify-content-center mt-3"
-                style={{
-                  border: "1px solid #000",
-                  width: "80%",
-                  height: "50px",
-                  borderRadius: "5px",
-                }}
-              >
-                <p className="m-0">Thanh toán trực tiếp bằng ví Metamask</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <h5>Đơn hàng</h5>
-            <div
-              className="d-flex align-items-center justify-content-between mt-3 pb-3"
-              style={{ borderBottom: "1px solid #000" }}
-            >
-              <div className="d-flex align-items-center position-relative mt-2">
-                <img
-                  style={{ width: "50px", height: "50px", borderRadius: "5px" }}
-                  src="https://product.hstatic.net/200000259653/product/kem-duong-body_132c28acd8e3451bb141261fd12808fa_a295287c6f3a47d4bf94f99f4d0b3ea4_grande.jpg"
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    background: "#d69c52",
-                    textAlign: "center",
-                    top: "-15%",
-                    left: "10%",
-                  }}
-                >
-                  1
-                </div>
-                <p style={{ marginLeft: "24px" }}>
-                  Kem dưỡng da mặt phục hồi và chống lão hóa
-                </p>
-              </div>
-              <p style={{ color: "#d69c52" }}>2.930.000đ</p>
-            </div>
-            <div className="mt-2" style={{ borderBottom: "1px solid #000" }}>
-              <div className="d-flex align-items-center justify-content-between ">
-                <p>Tạm tính</p>
-                <p>2.930.000đ</p>
-              </div>
-              <div className="d-flex align-items-center justify-content-between">
-                <p>Phí vận chuyển</p>
-                <p>0đ</p>
-              </div>
-            </div>
-            <div className="d-flex align-items-center justify-content-between mt-2">
-              <p>Tổng cộng</p>
-              <p style={{ color: "#d69c52", fontSize: "24px" }}>2.930.000đ</p>
-            </div>
-            <div className="d-flex align-items-center justify-content-between mt-2">
-              <Link to="/Cart" style={{ color: "#d69c52" }}>
-                {" "}
-                Quay về giỏ hàng
-              </Link>
-              <button
-                onClick={handleToThanks}
-                style={{
-                  width: "100px",
-                  height: "40px",
-                  borderRadius: "5px",
-                  border: "none",
-                  background: "#d69c52",
-                  color: "#fff",
-                }}
-              >
-                Đặt hàng
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// 3. Create a metadata object - optional
+const metadata = {
+  name: "My Website",
+  description: "My Website description",
+  url: "https://mywebsite.com", // origin must match your domain & subdomain
+  icons: ["https://avatars.mywebsite.com/"],
+};
 
-export default Pay;
+// 4. Create a AppKit instance
+createAppKit({
+  adapters: [new EthersAdapter()],
+  networks: [sepolia],
+  metadata,
+  projectId,
+  features: {
+    analytics: true, // Optional - defaults to your Cloud configuration
+  },
+});
+
+const CheckInput = () => {
+  const { walletProvider, isConnected, account } = useAppKitProvider("eip155");
+
+  const location = useLocation();
+  const [carts, setcarts] = useState();
+
+  const { type, data } = location.state || [];
+
+  useEffect(() => {
+    // Lấy balance của ví người dùng
+    const fetchBalance = async () => {
+      // if (!walletProvider || !account) return;
+      // alert("chưa kết nối đc ví");
+      console.log("walet", walletProvider);
+    };
+
+    fetchBalance();
+  }, [walletProvider, account]);
+
+  useEffect(() => {
+    if (type == "cart") {
+      console.log("cart");
+      cartApi
+        .getBySelectCart({
+          cart_ids: data,
+        })
+        .then((response) => {
+          setcarts(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else if (type == "product_detail") {
+      setcarts(data);
+    }
+  }, []);
+
+  return carts ? <Pay getcarts={carts} /> : <Loading />;
+};
+
+export default CheckInput;

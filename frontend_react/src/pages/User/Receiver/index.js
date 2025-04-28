@@ -1,22 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./style.css";
 import AddReceiver from "./AddReceiver";
 import UpdateReceiver from "./UpdateReceiver";
-const setReceiver = [
-  {
-    receiver_id: 1,
-    receiver_name: "vững",
-    receiver_phone: "01982648281",
-    receiver_city: "ha noi",
-    receiver_district: "Liep tuyet",
-    receiver_commune: "quoc oai",
-    receiver_dsc: "xom giưa",
-    receiver_type: 1,
-  },
-];
+import receiverApi from "../../../api/receiverApi";
 
 const Receiver = () => {
-  const [selectedReceiverId, setSelectedReceiverId] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isFormUpdateVisible, setIsFormUpdateVisible] = useState(false);
   const [style_receiverType, setStyle] = useState({
@@ -25,8 +12,8 @@ const Receiver = () => {
   });
   const [style_noDelete, setdelete] = useState({ display: "none" });
 
-  const [receiver, setData] = useState(setReceiver);
-  const [userId, setUserId] = useState(null);
+  const [receivers, setreceivers] = useState(null);
+  const [selectedReceiver, setSelectedReceiver] = useState(null);
 
   const openForm = () => {
     setIsFormVisible(true);
@@ -37,8 +24,9 @@ const Receiver = () => {
     setIsFormVisible(false);
   };
 
-  const openFormUpdate = () => {
+  const openFormUpdate = (receiver) => {
     setIsFormUpdateVisible(true);
+    setSelectedReceiver(receiver);
   };
 
   // Đóng form
@@ -47,155 +35,139 @@ const Receiver = () => {
   };
 
   useEffect(() => {
-    // const userData = localStorage.getItem("user");
-    // const parsedUser = JSON.parse(userData);
-    // setUserId(parsedUser.user_id);
+    GetReceivers();
   }, []);
 
-  useEffect(() => {
-    // if (userId !== null) {
-    //   axios
-    //     .get(`${apiUrl}/api/users/${userId}/receivers`)
-    //     .then((response) => {
-    //       // Truy cập vào phần "data" của API trả về và đặt vào state
-    //       setData(response.data.data);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error fetching data: ", error);
-    //     });
-    // }
-  }, [userId]);
-
-  const updateReceivers = () => {
-    // axios.get(`${apiUrl}/api/users/${userId}/receivers`)
-    // .then(response => {
-    //     setData(response.data.data);
-    // })
-    // .catch(error => {
-    //     console.error('Có lỗi khi cập nhật danh sách danh mục!');
-    // });
+  const GetReceivers = () => {
+    receiverApi
+      .getReceiversByUser()
+      .then((response) => {
+        setreceivers(response.data);
+      })
+      .catch((error) => {
+        console.error("Có lỗi khi cập nhật danh sách danh mục!");
+      });
   };
 
   //
   const deleteReceiver = (receiverId) => {
-    // if (window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này không?')) {
-    //   axios.delete(`${apiUrl}/api/receivers/${receiverId}`)
-    //     .then(response => {
-    //         updateReceivers(); // Cập nhật lại danh sách sau khi xóa
-    //     })
-    // }
+    if (window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này không?")) {
+      receiverApi.delete(receiverId).then((response) => {
+        alert("đã xóa thành công địa chỉ này");
+        GetReceivers(); // Cập nhật lại danh sách sau khi xóa
+      });
+    }
   };
 
   const HandlesetDefault = (receiver) => {
-    // if(receiver.receiver_type == 0){
-    //   setDefault(receiver);
-    // }
+    if (receiver.type == 0) {
+      setDefault(receiver);
+    }
   };
 
   const setDefault = (receiver) => {
-    // if(userId!==null){
-    //   axios.get(`${apiUrl}/api/users/${userId}/receivers/${receiver.receiver_id}/status`,)
-    //   .then(response => {
-    //       // Gọi lại API để cập nhật danh sách địa chỉ sau khi thiết lập mặc định
-    //       updateReceivers();
-    //   })
-    //   .catch(error => {
-    //     console.error('Lỗi khi thiết lập mặc định:', error);
-    //   });
-    // }
+    console.log(receiver);
+    receiverApi
+      .setTypeByReceiver(receiver.id)
+      .then((response) => {
+        // Gọi lại API để cập nhật danh sách địa chỉ sau khi thiết lập mặc định
+        alert("đã thiết lập thành công");
+        GetReceivers();
+      })
+      .catch((error) => {
+        console.error("Lỗi khi thiết lập mặc định:", error);
+      });
   };
 
   return (
-    <div className="container mb-4 mt-4">
-      <div className="row mt-4 sp_title mb-4">
+    <div className="container mb-4 mt-4 pt-3">
+      <div className="row mt-4 mb-4 pb-3 border-bottom border-3">
         <div className="col-10">
           <h6>Địa chỉ của tôi</h6>
         </div>
         <div className="col-2">
-          <button onClick={() => openForm()}>+ Thêm địa chỉ mới</button>
+          <button
+            onClick={() => openForm()}
+            className="btn btn-outline-primary"
+          >
+            Thêm địa chỉ mới
+          </button>
           {isFormVisible && (
             <>
-              <div className="overlay active"></div> {/* Lớp overlay */}
+              <div className="overlay1 active"></div> {/* Lớp overlay */}
               {isFormVisible && (
                 <AddReceiver
-                  onUpdate={updateReceivers}
+                  onUpdate={GetReceivers}
                   onClose={closeForm}
                   setDefault={setDefault}
-                  count_receiver={receiver}
                 />
               )}
             </>
           )}
         </div>
       </div>
-      <h6>Địa chỉ</h6>
-      {receiver && receiver.length > 0 ? (
-        receiver.map((item) => (
-          <div className="mt-4 row" key={item.receiver_id}>
+      {receivers &&
+        receivers.map((receiver) => (
+          <div className="mt-4 row" key={receiver.id}>
             {/* Nội dung hiển thị cho từng địa chỉ */}
-            <div className="col-md-10 address col-12">
+            <div className="col-md-10 col-12 fw-semibold text-capitalize fs-6">
               <p>
-                <span className="name">{item.receiver_name}</span>
-                <span className="sđt">{item.receiver_phone}</span>
+                <span className="me-3">{receiver.name}</span>
+                <span className="">{receiver.phone}</span>
               </p>
-              <p>{item.receiver_dsc}</p>
               <p>
-                {item.receiver_commune}, {item.receiver_district},
-                {item.receiver_city}
+                {receiver.commune}, {receiver.district},{receiver.city}
               </p>
+              <p>{receiver.dsc}</p>
               <p
-                className="macd rounded-2"
+                className="macd border rounded-2 p-2"
                 style={{
                   color: "red",
-                  display: item.receiver_type == 1 ? "inline-block" : "none",
+                  display: receiver.type == 1 ? "inline-block" : "none",
                 }}
               >
                 Mặc định
               </p>
             </div>
-            <div className="col-md-2 sp-bt ">
-              <div className="">
+            <div className="col-md-2">
+              <div>
                 <button
-                  className="sp-bt_capnhat "
-                  onClick={() => openForm(item.receiver_id)}
+                  className="btn btn-outline-primary me-2"
+                  onClick={() => openFormUpdate(receiver)}
                 >
                   Cập nhật
                 </button>
-                {isFormVisible && (
-                  <>
-                    <div className="addReceiver_overlay"></div>{" "}
-                    {/* Lớp overlay */}
-                    {isFormVisible && (
-                      <UpdateReceiver
-                        receiverId={selectedReceiverId}
-                        onUpdate={updateReceivers}
-                        onClose={closeForm}
-                        setDefault={setDefault}
-                        count_receiver={receiver}
-                      />
-                    )}
-                  </>
-                )}
+
                 <button
-                  className="sp-bt_capnhat"
-                  onClick={() => deleteReceiver(item.receiver_id)}
-                  style={item.receiver_type == 1 ? style_noDelete : {}}
+                  className="btn btn-danger btn-sm rounded-2"
+                  onClick={() => deleteReceiver(receiver.id)}
+                  style={receiver.type == 1 ? style_noDelete : {}}
                 >
                   Xóa
                 </button>
               </div>
               <button
-                className="sp-bt_md rounded-2"
-                onClick={() => HandlesetDefault(item)}
-                style={item.receiver_type == 1 ? style_receiverType : {}}
+                className="btn btn-outline-secondary rounded-2 mt-2"
+                onClick={() => HandlesetDefault(receiver)}
+                style={receiver.type == 1 ? style_receiverType : {}}
               >
                 Thiết lập mặc định
               </button>
             </div>
           </div>
-        ))
-      ) : (
-        <p>Không có địa chỉ nào để hiển thị</p>
+        ))}
+      {isFormUpdateVisible && (
+        <>
+          <div className="addoverlay"></div> {/* Lớp overlay */}
+          {isFormUpdateVisible && selectedReceiver && (
+            <UpdateReceiver
+              onUpdate={GetReceivers}
+              onClose={closeFormUpdate}
+              setDefault={setDefault}
+              receiver={selectedReceiver}
+            />
+          )}
+        </>
       )}
     </div>
   );

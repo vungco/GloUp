@@ -1,8 +1,9 @@
 // src/api/axiosClient.js
 import axios from "axios";
+import { apiUrl } from "../config";
 
 const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL + "/api", // Sử dụng biến môi trường cho dễ quản lý
+  baseURL: apiUrl + "/api", // Sử dụng biến môi trường cho dễ quản lý
   headers: {
     "Content-Type": "application/json",
   },
@@ -24,6 +25,7 @@ axiosClient.interceptors.request.use((config) => {
 
 axiosClient.interceptors.response.use(
   (response) => response.data, // Lấy trực tiếp data từ response
+
   (error) => {
     // Xử lý lỗi
     return Promise.reject(error);

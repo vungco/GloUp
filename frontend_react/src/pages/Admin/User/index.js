@@ -1,39 +1,41 @@
 import React, { useEffect, useState } from "react";
-import categoryApi from "../../../api/categoryApi";
+import userApi from "../../../api/userApi";
 import CreateForm from "./create";
 import EditForm from "./edit";
 
-function Category() {
-  const [categories, setcategories] = useState(null);
+function User() {
+  const [Users, setUsers] = useState(null);
   const [isShowFormCreate, setisShowFormCreate] = useState(false);
   const [isShowFormEdit, setisShowFormEdit] = useState(false);
 
   useEffect(() => {
-    Getcategories();
+    GetUsers();
   }, []);
 
-  function Getcategories() {
-    categoryApi
+  function GetUsers() {
+    userApi
       .getAll()
       .then((response) => {
-        setcategories(response.data);
+        setUsers(response.data);
       })
       .catch((error) => {
-        console.error("có lỗi trong quá trình lấy dl: " + error);
+        console.error(error);
       });
   }
 
-  function Deletetable(id) {
-    let getconfirm = window.confirm("bạn có thực sự muốn xóa nhóm này không ?");
+  function DeleteUser(id) {
+    let getconfirm = window.confirm(
+      "bạn có thực sự muốn xóa người dùng này không ?"
+    );
     if (getconfirm) {
-      categoryApi
+      userApi
         .delete(id)
         .then((response) => {
-          alert("bạn đã xóa nhóm thành công");
-          Getcategories();
+          alert("bạn đã xóa người dùng thành công");
+          GetUsers();
         })
         .catch((error) => {
-          console.error(error);
+          console.error("có lỗi trong quá trình xóa dl: " + error);
         });
     }
   }
@@ -47,47 +49,54 @@ function Category() {
         >
           <i className="fa fa-plus"></i> Thêm
         </button>
-        {isShowFormCreate && (
+        {isShowFormCreate ? (
           <CreateForm
             setisShowFormCreate={setisShowFormCreate}
-            Getcategories={Getcategories}
+            GetUsers={GetUsers}
           />
+        ) : (
+          ""
         )}
       </div>
       <table className="table table-bordered table-hover">
         <thead className="table-dark">
           <tr>
-            <th>Tên nhóm mỹ phẩm: </th>
-
+            <th>Tên người dùng</th>
+            <th>Email</th>
+            <th>Vai trò</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {categories?.map((category) => (
-            <tr key={category.id}>
-              <td>{category.name}</td>
-
+          {Users?.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.role}</td>
               <td>
                 <button
                   className="btn btn-warning btn-sm me-2"
-                  onClick={() => setisShowFormEdit(category)}
+                  onClick={() => setisShowFormEdit(user)}
                 >
                   <i className="fa fa-edit"></i> Sửa
                 </button>
-
-                {isShowFormEdit.id == category.id && (
-                  <>
-                    <EditForm
-                      setisShowFormEdit={setisShowFormEdit}
-                      Getcategories={Getcategories}
-                      data={{ name: category.name }}
-                      id={category.id}
-                    />
-                  </>
+                {isShowFormEdit.id == user.id ? (
+                  <EditForm
+                    setisShowFormEdit={setisShowFormEdit}
+                    GetUsers={GetUsers}
+                    data={{
+                      name: user.name,
+                      email: user.email,
+                      role: user.role,
+                    }}
+                    id={user.id}
+                  />
+                ) : (
+                  ""
                 )}
                 <button
                   className="btn btn-danger btn-sm"
-                  onClick={() => Deletetable(category.id)}
+                  onClick={() => DeleteUser(user.id)}
                 >
                   <i className="fa fa-trash"></i> Xóa
                 </button>
@@ -100,4 +109,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default User;

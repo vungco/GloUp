@@ -1,53 +1,35 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import receiverApi from "../../../api/receiverApi";
+import "./style.css";
 
-const AddReceiver = ({ onUpdate, onClose, setDefault, count_receiver }) => {
-  const [userId, setUserId] = useState(null);
+const AddReceiver = ({ onUpdate, onClose, setDefault }) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [communes, setCommunes] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedCommune, setSelectedCommune] = useState("");
-  const type = 0;
   const checkboxRef = useRef(null);
 
-  // const [receiver_name, setreceiver_name] = useState('');
-  // const [receiver_phone, setreceiver_phone] = useState('');
-  // const [receiver_dsc, setreceiver_dsc] = useState('');
+  const [user_id, setuser_id] = useState(null);
+  const [name, setname] = useState("");
+  const [phone, setphone] = useState("");
+  const [city, setcity] = useState("");
+  const [district, setdistrict] = useState("");
+  const [commune, setcommune] = useState("");
+  const [dsc, setdsc] = useState("");
+
   useEffect(() => {
-    // const userData = localStorage.getItem("user");
-    // const parsedUser = JSON.parse(userData);
-    // if (parsedUser && parsedUser.user_id !== null) {
-    //   setUserId(parsedUser.user_id);
-    // }
+    const userData = localStorage.getItem("user");
+    const parsedUser = JSON.parse(userData);
+    if (parsedUser && parsedUser.user_id !== null) {
+      setuser_id(parsedUser.id);
+    }
   }, []);
-
-  const [receiver, setReceiver] = useState({
-    user_id: userId,
-    receiver_name: "",
-    receiver_phone: "",
-    receiver_city: "",
-    receiver_district: "",
-    receiver_commune: "",
-    receiver_dsc: "",
-    receiver_type: type,
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setReceiver({
-      ...receiver,
-      [name]: value,
-    });
-  };
 
   // Lấy danh sách Tỉnh khi component được load
   useEffect(() => {
-    axios
-      .get("https://api.mysupership.vn/v1/partner/areas/province")
+    receiverApi
+      .getprovinces()
       .then((response) => {
-        setProvinces(response.data.results);
+        setProvinces(response.results);
       })
       .catch((error) => {
         console.error("Error fetching provinces:", error);
@@ -56,27 +38,14 @@ const AddReceiver = ({ onUpdate, onClose, setDefault, count_receiver }) => {
 
   // Lấy danh sách Huyện khi chọn Tỉnh
   const handleProvinceChange = (e) => {
-    const provinceId = e.target.value;
-    const provinceName = provinces.find(
-      (province) => province.code === e.target.value
-    );
-    setSelectedProvince(provinceName.name);
+    const province = JSON.parse(e.target.value);
+    setcity(province.name);
 
-    setSelectedDistrict(""); // Reset huyện
-    setCommunes([]); // Reset xã
-
-    setReceiver({
-      ...receiver,
-      receiver_city: provinceName.name,
-    });
-
-    if (provinceId) {
-      axios
-        .get("https://api.mysupership.vn/v1/partner/areas/district", {
-          params: { province: provinceId },
-        })
+    if (province) {
+      receiverApi
+        .getdistricts({ province: province.code })
         .then((response) => {
-          setDistricts(response.data.results);
+          setDistricts(response.results);
         })
         .catch((error) => {
           console.error("Error fetching districts:", error);
@@ -88,23 +57,14 @@ const AddReceiver = ({ onUpdate, onClose, setDefault, count_receiver }) => {
 
   // Lấy danh sách Xã khi chọn Huyện
   const handleDistrictChange = (e) => {
-    const districtId = e.target.value;
-    const districtName = districts.find(
-      (district) => district.code === e.target.value
-    );
-    setSelectedDistrict(districtName.name);
-    setReceiver({
-      ...receiver,
-      receiver_district: districtName.name,
-    });
+    const district = JSON.parse(e.target.value);
+    setdistrict(district.name);
 
-    if (districtId) {
-      axios
-        .get("https://api.mysupership.vn/v1/partner/areas/commune", {
-          params: { district: districtId },
-        })
+    if (district) {
+      receiverApi
+        .getcommunes({ district: district.code })
         .then((response) => {
-          setCommunes(response.data.results);
+          setCommunes(response.results);
         })
         .catch((error) => {
           console.error("Error fetching communes:", error);
@@ -114,19 +74,37 @@ const AddReceiver = ({ onUpdate, onClose, setDefault, count_receiver }) => {
     }
   };
   const handleCommuneChange = (e) => {
-    const communeId = e.target.value;
-    const communeName = communes.find(
-      (commune) => commune.code === e.target.value
-    );
-    setSelectedCommune(communeName.name);
-    setReceiver({
-      ...receiver,
-      receiver_commune: communeName.name,
-    });
+    const commune = JSON.parse(e.target.value);
+    setcommune(commune.name);
   };
 
   const handleSubmit = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
+    let data = {
+      user_id,
+      name,
+      phone,
+      city,
+      district,
+      commune,
+      dsc,
+      type: 0,
+    };
+
+    receiverApi
+      .create(data)
+      .then((response) => {
+        alert("bạn đã thêm người nhận thành công");
+        if (checkboxRef.current.checked) {
+          setDefault(response.data);
+        }
+        console.log(response.data);
+        onUpdate();
+        onClose();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   return (
     <>
@@ -141,66 +119,52 @@ const AddReceiver = ({ onUpdate, onClose, setDefault, count_receiver }) => {
               className=""
               type="text"
               placeholder="Họ tên"
-              name="receiver_name"
-              value={receiver.receiver_name}
-              onChange={handleChange}
+              value={name}
+              onChange={(e) => setname(e.target.value)}
             ></input>
             <input
               className=""
               type="text"
               placeholder="Số điện thoại"
-              name="receiver_phone"
-              value={receiver.receiver_phone}
-              onChange={handleChange}
+              value={phone}
+              onChange={(e) => setphone(e.target.value)}
             ></input>
           </div>
           <div className="mt-3 form-popup2">
             <select
-              id="city"
-              name="receiver_city"
               class="form-control"
-              value={selectedProvince}
+              value={city}
               onChange={handleProvinceChange}
             >
-              <option value={receiver.receiver_city} disabled selected>
-                {receiver.receiver_city}
-              </option>
+              <option hidden>{city}</option>
               {provinces.map((province) => (
-                <option key={province.code} value={province.code}>
+                <option value={JSON.stringify(province)}>
                   {province.name}
                 </option>
               ))}
             </select>
             <select
-              id="city"
-              name="receiver_district"
               class="form-control"
-              value={selectedDistrict}
+              value={district}
               onChange={handleDistrictChange}
             >
-              <option value={receiver.receiver_district} disabled selected>
-                {receiver.receiver_district}
-              </option>
+              <option hidden>{district}</option>
+
               {districts.map((district) => (
-                <option key={district.code} value={district.code}>
+                <option value={JSON.stringify(district)}>
                   {district.name}
                 </option>
               ))}
             </select>
             <select
-              id="city"
-              name="receiver_commune"
               class="form-control"
-              value={selectedCommune}
+              value={commune}
               onChange={handleCommuneChange}
             >
-              <option value={receiver.receiver_commune} disabled selected>
-                {receiver.receiver_commune}
-              </option>
+              <option hidden>{commune}</option>
+
               {communes.map((commune) => (
-                <option key={commune.code} value={commune.code}>
-                  {commune.name}
-                </option>
+                <option value={JSON.stringify(commune)}>{commune.name}</option>
               ))}
             </select>
           </div>
@@ -208,38 +172,20 @@ const AddReceiver = ({ onUpdate, onClose, setDefault, count_receiver }) => {
             <input
               type="text"
               placeholder="Địa chỉ cụ thể"
-              name="receiver_dsc"
-              value={receiver.receiver_dsc}
-              onChange={handleChange}
+              value={dsc}
+              onChange={(e) => setdsc(e.target.value)}
             ></input>
           </div>
 
-          <div className="bt-them">
-            <button>+ Thêm vị trí</button>
-          </div>
-
-          <div className="d-flex">
+          <div className="d-flex mt-2 mb-2">
             <input
               className="form-check-input me-2"
               type="checkbox"
               defaultValue
               id="squareCheckbox"
               ref={checkboxRef}
-              style={
-                receiver.receiver_type == 1 || count_receiver == null
-                  ? { display: "none" }
-                  : {}
-              }
             />
-            <p
-              style={
-                receiver.receiver_type == 1 || count_receiver == null
-                  ? { display: "none" }
-                  : {}
-              }
-            >
-              Đặt làm địa chỉ mặc định
-            </p>
+            Đặt làm địa chỉ mặc định
           </div>
 
           <button type="submit" className="btn btn-primary">
