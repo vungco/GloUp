@@ -1,16 +1,55 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { pathUrl } from "../../../utils/path";
 import receiverApi from "../../../api/receiverApi";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { shortenAddr } from "../../../utils/shortAddress";
+import { getEthAmountFromVnd } from "../../../utils/getEthFromVnd";
+import { ethers } from "ethers";
+import { uploadToPinata } from "../../../utils/uploadIpfs";
+import { useEthersProvider } from "../../../contexts/EtherContext";
+import {
+  contractAddr,
+  contractABI,
+} from "../../../contracts/Order/ContractData";
+import { Contract } from "ethers";
 
-function Pay({ getcarts, a }) {
+function Pay({ getcarts }) {
+  const { address, isConnected } = useAppKitAccount();
+  const { open } = useAppKit();
+
   const navigate = useNavigate();
   const [carts, setcarts] = useState([]);
   const [receiver, setreceiver] = useState([]);
-  const [sumtotalmoney, setsumtotalmoney] = useState();
+  const [sumtotalmoney, setsumtotalmoney] = useState(0);
+  const [ethPriceVnd, setethPriceVnd] = useState(null);
+  const [voucherAmount, setvoucherAmount] = useState(0);
+  const [finalAmount, setfinalAmount] = useState(0);
 
+  const ethersProvider = useEthersProvider();
+  const [loading, setLoading] = useState(false);
+  const [txhash, settxhash] = useState();
+
+  //   lấy giá eth hiện tại
+
+  useEffect(() => {
+    const GetEth_vnd = async () => {
+      const val = await getEthAmountFromVnd();
+      setethPriceVnd(val);
+    };
+    GetEth_vnd();
+  }, []);
+
+  //   thực hiện chuyển đổi vnđ => wei
+  function formatToWei(vndAmount) {
+    const ethAmount = vndAmount / ethPriceVnd;
+    const ethAmountInWei = ethers.parseEther(ethAmount.toString()); // Chuyển ETH thành Wei (18 decimal places)
+    return ethAmountInWei;
+  }
+
+  //  load dữ liệu carts
   useEffect(() => {
     setcarts(getcarts);
 
@@ -30,7 +69,11 @@ function Pay({ getcarts, a }) {
     }
   }, [carts]);
 
-  const handleToThanks = () => {
+  useEffect(() => {
+    setfinalAmount(sumtotalmoney - voucherAmount);
+  }, [sumtotalmoney, voucherAmount]);
+
+  const ToThanks = () => {
     navigate("/Thankyou"); // Chuyển đến trang Pay
   };
 
@@ -38,6 +81,34 @@ function Pay({ getcarts, a }) {
     const total = carts.reduce((sum, cart) => sum + cart.totalmoney, 0);
     setsumtotalmoney(total);
   }
+
+  const handleOrderContract = async () => {
+    try {
+      setLoading(true);
+
+      const data_carts = JSON.stringify(carts);
+      const data_receiver = JSON.stringify(carts);
+      const hash_carts = await uploadToPinata(data_carts);
+      const hash_receiver = await uploadToPinata(data_receiver);
+
+      const signer = await ethersProvider.getSigner();
+      const contract = new Contract(contractAddr, contractABI, signer);
+      const txResponse = await contract.createOrder(
+        voucherAmount,
+        formatToWei(finalAmount),
+        hash_receiver,
+        hash_carts,
+        {
+          value: formatToWei(finalAmount),
+        }
+      );
+      settxhash(txResponse.hash);
+      await txResponse.wait();
+      ToThanks();
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div>
       <div className="container-fluid" style={{ background: "#F8D5D7" }}>
@@ -111,6 +182,24 @@ function Pay({ getcarts, a }) {
               >
                 <p className="m-0">Thanh toán trực tiếp bằng ví Metamask</p>
               </div>
+              <div>
+                <button onClick={() => open()}>
+                  {isConnected ? shortenAddr(address) : "Connect Wallet"}
+                </button>
+              </div>
+
+              {loading && (
+                <div>
+                  <span>Transaction: </span>
+                  <a
+                    target="_blank"
+                    href={`https://sepolia.etherscan.io/tx/${txhash}`}
+                    className="cursor-pointer hover:underline"
+                  >
+                    {shortenAddr(txhash)}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
           <div className="col-md-4">
@@ -162,14 +251,21 @@ function Pay({ getcarts, a }) {
                 <p>{sumtotalmoney}</p>
               </div>
               <div className="d-flex align-items-center justify-content-between">
-                <p>Phí vận chuyển</p>
-                <p>0đ</p>
+                <p>Voucher áp dụng</p>
+                <p>{voucherAmount} đ</p>
               </div>
             </div>
             <div className="d-flex align-items-center justify-content-between mt-2">
               <p>Tổng cộng</p>
               <p style={{ color: "#d69c52", fontSize: "24px" }}>
-                {sumtotalmoney}
+                {finalAmount}
+              </p>
+            </div>
+            <div className="d-flex align-items-center justify-content-between mt-2">
+              <p>~</p>
+              <p style={{ color: "#d69c52", fontSize: "24px" }}>
+                {ethPriceVnd && ethers.formatEther(formatToWei(finalAmount), 2)}{" "}
+                ETH
               </p>
             </div>
             <div className="d-flex align-items-center justify-content-between mt-2">
@@ -178,7 +274,7 @@ function Pay({ getcarts, a }) {
                 Quay về giỏ hàng
               </Link>
               <button
-                onClick={handleToThanks}
+                onClick={handleOrderContract}
                 style={{
                   width: "100px",
                   height: "40px",
