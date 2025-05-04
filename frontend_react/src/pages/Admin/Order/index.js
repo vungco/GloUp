@@ -6,6 +6,7 @@ import CheckInstall from "../../../components/share/Ethers/CheckInstall";
 import CheckConnected from "../../../components/share/Ethers/CheckInsConnect";
 import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
+import { formatBlockchainTimestamp } from "../../../utils/formatTimestap";
 
 const ORDER_STATUS = {
   0: "Pending",
@@ -21,44 +22,50 @@ const Order = () => {
   const { contract } = useEthersProvider() || {};
 
   const [orders, setorders] = useState();
-  const [inputAddress, setinputAddress] = useState("");
+  const [selectedStatus, setselectedStatus] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     if (contract) {
-      getOrdersOfByner(address);
+      getOrders();
     }
   }, [contract]);
 
-  function formatBlockchainTimestamp(tsBN) {
-    const ts =
-      typeof tsBN.toNumber === "function" ? tsBN.toNumber() : Number(tsBN); // hỗ trợ BigNumber & BigInt
-    return new Date(ts * 1000).toLocaleString(); // hoặc dùng dayjs nếu muốn
-  }
-
-  const getOrdersOfByner = async (address) => {
+  const getOrdersByStatus = async (status) => {
     try {
-      const orders = await contract.getOrdersByBuyer(address);
-      const realOrders = Array.from(orders);
-      const cleanOrders = orders.map((order) => ({
-        id: order.id.toString(),
-        buyer: order.buyer,
-        createdAt: formatBlockchainTimestamp(order.createdAt),
-        finalAmount: ethers.formatEther(order.finalAmount).toString(),
-        voucherAmount: ethers.formatEther(order.voucherAmount).toString(),
-        inforUserCID: order.inforUserCID,
-        orderDetailCID: order.orderDetailCID,
-        status: ORDER_STATUS[order.status],
-      }));
+      const orders = await contract.getOrdersByStatus(status);
 
-      setorders(cleanOrders);
+      setorders(clenOrder(orders));
     } catch (error) {
       alert("address ko hợp lệ hoặc có lỗi");
     }
   };
 
+  const getOrders = async () => {
+    try {
+      const orders = await contract.getAllOrders();
+
+      setorders(clenOrder(orders));
+    } catch (error) {
+      alert("address ko hợp lệ hoặc có lỗi");
+    }
+  };
+
+  function clenOrder(orders) {
+    return orders.map((order) => ({
+      id: order.id.toString(),
+      buyer: order.buyer,
+      createdAt: formatBlockchainTimestamp(order.createdAt),
+      finalAmount: ethers.formatEther(order.finalAmount).toString(),
+      voucherAmount: ethers.formatEther(order.voucherAmount).toString(),
+      inforUserCID: order.inforUserCID,
+      orderDetailCID: order.orderDetailCID,
+      status: ORDER_STATUS[order.status],
+    }));
+  }
+
   function handleToOrderDetail(id) {
-    navigate(`/OrderDetail/${id}`); // Chuyển đến trang Pay
+    navigate(`/Admin/OrderDetail/${id}`); // Chuyển đến trang Pay
   }
 
   return (
@@ -71,22 +78,31 @@ const Order = () => {
           <h2>Danh sách đơn hàng</h2>
 
           <form class="mb-3">
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Tìm theo address khác"
-                id="searchInput"
-                value={inputAddress}
-                onChange={(e) => setinputAddress(e.target.value)}
-              />
+            <div class="input-group mb-3">
+              <select
+                class="form-select"
+                value={selectedStatus}
+                onChange={(e) => setselectedStatus(e.target.value)}
+              >
+                <option hidden>Tất cả trạng thái</option>
+                <option value="0">Chờ xác nhận</option>
+                <option value="1">Đã xác nhận</option>
+                <option value="2">Đã hủy</option>
+                <option value="3">Đang giao hàng</option>
+              </select>
               <button
                 class="btn btn-outline-secondary"
                 type="button"
-                id="searchButton"
-                onClick={() => getOrdersOfByner(inputAddress)}
+                onClick={() => getOrdersByStatus(selectedStatus)}
               >
                 🔍
+              </button>
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onClick={() => getOrders()}
+              >
+                Hiển thị tất cả
               </button>
             </div>
           </form>
@@ -95,6 +111,7 @@ const Order = () => {
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Buyer</th>
                 <th>Thời gian</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
@@ -103,19 +120,12 @@ const Order = () => {
             <tbody id="orderTable">
               {orders &&
                 orders.map((order, index) => (
-                  <tr>
+                  <tr key={index}>
                     <td>{order.id}</td>
+                    <td>{order.buyer}</td>
                     <td>{order.createdAt}</td>
                     <td>
-                      {order.status === "Pending" && (
-                        <span class="badge bg-warning">{order.status}</span>
-                      )}
-                      {order.status !== "Pending" && (
-                        <span class="badge bg-dark">{order.status}</span>
-                      )}
-                      {order.status === "Successful" && (
-                        <span class="badge bg-success">{order.status}</span>
-                      )}
+                      <span class="badge bg-warning">{order.status}</span>
                     </td>
                     <td>
                       <button

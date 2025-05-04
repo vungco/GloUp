@@ -8,6 +8,10 @@ import News from "../pages/User/News";
 import Contact from "../pages/User/Contact";
 import About from "../pages/User/About";
 import Receiver from "../pages/User/Receiver";
+import Order from "../pages/User/Order";
+import OrderDetail from "../pages/User/Order_detail";
+import Voucher from "../pages/User/Voucher";
+import Voucher_detail from "../pages/User/Voucher/NFTCard_detail";
 import Thankyou from "../pages/User/Thankyou";
 import AdHome from "../pages/Admin/Home";
 import admin from "../components/Layout/Admin";
@@ -16,6 +20,10 @@ import Category from "../pages/Admin/Category";
 import Supplier from "../pages/Admin/Supplier";
 import AdProduct from "../pages/Admin/Product";
 import AdReceiver from "../pages/Admin/Receiver";
+import AdOrderDetail from "../pages/Admin/Order_detail";
+import AdOrder from "../pages/Admin/Order";
+import AdVoucher_create from "../pages/Admin/Voucher/create";
+import AdVoucher from "../pages/Admin/Voucher";
 
 const publicRoutes = [
   {
@@ -55,6 +63,22 @@ const publicRoutes = [
     component: Receiver,
   },
   {
+    path: "/Order",
+    component: Order,
+  },
+  {
+    path: "/Voucher",
+    component: Voucher,
+  },
+  {
+    path: "/Voucher/:tokenId",
+    component: Voucher_detail,
+  },
+  {
+    path: "/OrderDetail/:id",
+    component: OrderDetail,
+  },
+  {
     path: "/Thankyou",
     component: Thankyou,
   },
@@ -86,6 +110,26 @@ const publicRoutes = [
   {
     path: "/Admin/Receiver",
     component: AdReceiver,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Order",
+    component: AdOrder,
+    layout: admin,
+  },
+  {
+    path: "/Admin/OrderDetail/:id",
+    component: AdOrderDetail,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Voucher",
+    component: AdVoucher,
+    layout: admin,
+  },
+  {
+    path: "/Admin/Voucher/create",
+    component: AdVoucher_create,
     layout: admin,
   },
 ];

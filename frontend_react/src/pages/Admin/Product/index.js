@@ -6,7 +6,7 @@ import { formatNumber } from "../../../utils/formatNumber";
 import { pathUrl } from "../../../utils/path";
 
 function Product() {
-  const [products, setproducts] = useState(null);
+  const [products, setproducts] = useState();
   const [isShowFormCreate, setisShowFormCreate] = useState(false);
   const [isShowFormEdit, setisShowFormEdit] = useState(false);
 
@@ -73,54 +73,55 @@ function Product() {
           </tr>
         </thead>
         <tbody>
-          {products?.map((product) => (
-            <tr key={product.id}>
-              <td>{product.category?.name}</td>
-              <td>{product.name}</td>
-              <td>
-                <img
-                  style={{ width: "180px", height: "100px" }}
-                  src={pathUrl(product.img)}
-                  alt="Product Image"
-                />
-              </td>
-              <td>{formatNumber(product.price)}</td>
-              <td>{product.dsc}</td>
-              <td>{product.quantity}</td>
-              <td>{product.supplier.name}</td>
-              <td>
-                <button
-                  className="btn btn-warning btn-sm me-2"
-                  onClick={() => setisShowFormEdit(product)}
-                >
-                  <i className="fa fa-edit"></i> Sửa
-                </button>
-                {isShowFormEdit.id == product.id && (
-                  <EditForm
-                    setisShowFormEdit={setisShowFormEdit}
-                    Getproducts={Getproducts}
-                    data={{
-                      category_id: product.category.id,
-                      category_name: product.category.name,
-                      name: product.name,
-                      dsc: product.dsc,
-                      price: product.price,
-                      quantity: product.quantity,
-                      supplier_id: product.supplier.id,
-                      supplier_name: product.supplier.name,
-                    }}
-                    id={product.id}
+          {products &&
+            products.map((product) => (
+              <tr key={product.id}>
+                <td>{product.category?.name}</td>
+                <td>{product.name}</td>
+                <td>
+                  <img
+                    style={{ width: "180px", height: "100px" }}
+                    src={pathUrl(product.img)}
+                    alt="Product Image"
                   />
-                )}
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => Deleteproduct(product.id)}
-                >
-                  <i className="fa fa-trash"></i> Xóa
-                </button>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>{formatNumber(product.price)}</td>
+                <td>{product.dsc}</td>
+                <td>{product.quantity}</td>
+                <td>{product.supplier?.name}</td>
+                <td>
+                  <button
+                    className="btn btn-warning btn-sm me-2"
+                    onClick={() => setisShowFormEdit(product)}
+                  >
+                    <i className="fa fa-edit"></i> Sửa
+                  </button>
+                  {isShowFormEdit.id == product.id && (
+                    <EditForm
+                      setisShowFormEdit={setisShowFormEdit}
+                      Getproducts={Getproducts}
+                      data={{
+                        category_id: product.category.id,
+                        category_name: product.category.name,
+                        name: product.name,
+                        dsc: product.dsc,
+                        price: product.price,
+                        quantity: product.quantity,
+                        supplier_id: product.supplier.id,
+                        supplier_name: product.supplier.name,
+                      }}
+                      id={product.id}
+                    />
+                  )}
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => Deleteproduct(product.id)}
+                  >
+                    <i className="fa fa-trash"></i> Xóa
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

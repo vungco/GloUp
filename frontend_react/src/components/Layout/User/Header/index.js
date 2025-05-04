@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; // Import Link từ react-router-dom
 import Login from "../../../../pages/User/Login";
 import { useCart } from "../../../../contexts/CartContext";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { shortenAddr } from "../../../../utils/shortAddress";
+import { useEthersProvider } from "../../../../contexts/EtherContext";
 
 function Header() {
+  const { address, isConnected } = useAppKitAccount();
+  const { open } = useAppKit();
+
   const { cartCount, fetchCartCount } = useCart();
+  const { initProvider } = useEthersProvider();
 
   const [menuActive, setMenuActive] = useState(false);
   const [loginBoxActive, setLoginBoxActive] = useState(false);
@@ -14,7 +21,13 @@ function Header() {
 
   useEffect(() => {
     fetchCartCount();
-  });
+  }, []);
+
+  useEffect(() => {
+    if (isConnected) {
+      initProvider();
+    }
+  }, [isConnected]);
 
   // useEffect(() => {
   //     // Snow effect
@@ -58,7 +71,13 @@ function Header() {
                 />
               </Link>
             </div>
-            <div className="col-md-4"></div>
+            <div className="col-md-2"></div>
+            <div className="col-md-2">
+              <button className="btn btn-success" onClick={() => open()}>
+                {" "}
+                {isConnected ? shortenAddr(address) : "Connect Wallet"}
+              </button>
+            </div>
             <div className="col-md-2 row">
               <div className="col-md-6"></div>
               <div className="col-md-3">

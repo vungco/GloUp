@@ -14,9 +14,22 @@ import {
 import "./style.css";
 import axios from "axios";
 import React, { useState, useEffect, useRef } from "react";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useEthersProvider } from "../../../../contexts/EtherContext";
+import { shortenAddr } from "../../../../utils/shortAddress";
 // import logo from '../../../../assets/img/logo8.png';
 
 function Header() {
+  const { address, isConnected } = useAppKitAccount();
+  const { open } = useAppKit();
+  const { initProvider } = useEthersProvider();
+
+  useEffect(() => {
+    if (isConnected) {
+      initProvider();
+    }
+  }, [isConnected]);
+
   // đăng xuất
   const handleLogout = () => {
     axios.get("http://localhost:8000/api/user/logout");
@@ -107,7 +120,7 @@ function Header() {
               Glow Up
             </span>
           </div>
-          <div className="col-md-6 d-flex " style={{ alignItems: "center" }}>
+          <div className="col-md-4 d-flex " style={{ alignItems: "center" }}>
             <FontAwesomeIcon icon={faList} style={{ color: "#62677399" }} />
             <div className="search" style={{ marginLeft: "12px" }}>
               <input
@@ -129,6 +142,12 @@ function Header() {
                 <FontAwesomeIcon icon={faSearch} />
               </span>
             </div>
+          </div>
+          <div className="col-md-2">
+            <button className="btn btn-success" onClick={() => open()}>
+              {" "}
+              {isConnected ? shortenAddr(address) : "Connect Wallet"}
+            </button>
           </div>
           <div className="col-md-1 text-end">
             <FontAwesomeIcon icon={faBell} style={{ color: "#62677399" }} />

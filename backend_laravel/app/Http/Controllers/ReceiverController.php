@@ -14,7 +14,7 @@ class ReceiverController extends Controller
    */
   public function index()
   {
-    $get_receiver = Receiver::all();
+    $get_receiver = Receiver::with("user")->get();
 
     if (count($get_receiver) > 0) {
       return response()->json(

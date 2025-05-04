@@ -16,7 +16,7 @@ class ProductController extends Controller
    */
   public function index()
   {
-    $get_product = Product::all();
+    $get_product = Product::with("category")->with("supplier")->get();
 
     if (count($get_product) > 0) {
       return response()->json(

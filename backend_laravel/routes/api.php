@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
   // 3. Admin-only
   Route::middleware('admin')->group(function () {
-    Route::apiResource('users', UserController::class)->only(['store', 'update', 'delete']);
+    Route::apiResource('users', UserController::class)->only(['index', 'store', 'update', 'delete']);
     Route::apiResource('categories', CategoryController::class)->only(['store', 'update', 'delete']);
     Route::apiResource('products', ProductController::class)->only(['store', 'update', 'delete']);
     Route::apiResource('suppliers', SupplierController::class)->only(['store', 'update', 'delete']);
