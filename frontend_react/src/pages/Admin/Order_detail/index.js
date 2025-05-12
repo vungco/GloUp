@@ -11,11 +11,12 @@ const ORDER_STATUS = {
   1: "Confirmed",
   2: "Cancelled",
   3: "Shipping",
+  4: "Successful",
 };
 
 const OrderDetail = () => {
   const id = useParams().id;
-  const { contract } = useEthersProvider() || {};
+  const { contractOrder } = useEthersProvider() || {};
 
   const [orderDetails, setorderDetails] = useState();
   const [carts, setcarts] = useState();
@@ -24,15 +25,15 @@ const OrderDetail = () => {
   const [isloading, setisloading] = useState(true);
 
   useEffect(() => {
-    if (contract) {
+    if (contractOrder) {
       getOrderDetails(id);
     }
-  }, [contract]);
+  }, [contractOrder]);
 
   const getOrderDetails = async (id) => {
     try {
       setisloading(true);
-      const order_detail = await contract.getOrder(id);
+      const order_detail = await contractOrder.getOrder(id);
       const cleanOrderDetail = {
         id: order_detail.id.toString(),
         buyer: order_detail.buyer,
@@ -65,7 +66,7 @@ const OrderDetail = () => {
 
   const SetOrderByStatus = async (status) => {
     try {
-      const tx = await contract.updateOrderStatus(id, status);
+      const tx = await contractOrder.updateOrderStatus(id, status);
       setisloading(true);
 
       await tx.wait();

@@ -1,83 +1,123 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useEthersProvider } from "../../../contexts/EtherContext";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { shortenAddr } from "../../../utils/shortAddress";
+import { ethers, Interface } from "ethers";
 
-const exampleEvents = [
-  {
-    type: "Create",
-    tokenId: 1,
-    price: "1.5",
-    account: "0xabc...",
-    timestamp: "2025-05-04 12:30",
-  },
-  {
-    type: "Sell",
-    tokenId: 1,
-    price: "2.0",
-    account: "0xdef...",
-    timestamp: "2025-05-04 13:00",
-  },
-  {
-    type: "Apply",
-    tokenId: 1,
-    timestamp: "2025-05-04 14:00",
-  },
+const myCustomEvents = [
+  "MarketItemCreated",
+  "VoucherPurchased",
+  "VoucherReselled",
+  "VoucherUsed",
 ];
 
 const EventHistory = () => {
-  // lấy events theo address của user
-  const [events, setevents] = useState(exampleEvents);
+  const { contractVoucher, ethersProvider } = useEthersProvider() || {};
+  const { address } = useAppKitAccount();
+  const [balance, setBalance] = useState(null);
+  const [history, sethistory] = useState([]);
 
-  if (!events || events.length === 0) {
-    return <p>Không có hoạt động nào.</p>;
-  }
+  const handleGetHistory = async () => {
+    try {
+      if (!contractVoucher || !ethersProvider) return;
+
+      const contractAddress = await contractVoucher.getAddress(); // ethers v6
+      const contractInterface = contractVoucher.interface;
+
+      const contractBalance = await ethersProvider.getBalance(contractAddress);
+      setBalance(ethers.formatEther(contractBalance));
+
+      const logs = await ethersProvider.getLogs({
+        address: contractAddress.toLowerCase(),
+        fromBlock: 0,
+        toBlock: "latest",
+      });
+
+      const decoded = logs
+        .map((log) => {
+          try {
+            const parsed = contractInterface.parseLog(log); // ethers v6 vẫn còn parseLog()
+            return {
+              event: parsed.name,
+              args: parsed.args,
+              blockNumber: log.blockNumber,
+              txHash: log.transactionHash,
+            };
+          } catch (err) {
+            return { undecoded: true, log }; // dùng để debug nếu không match
+          }
+        })
+        .filter(
+          (log) => log && myCustomEvents.includes(log.event) // chỉ giữ event mình định nghĩa
+        );
+      sethistory(decoded);
+    } catch (error) {
+      alert("có lỗi trong quá trình thực hiện");
+      console.error(error);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    if (contractVoucher) {
+      handleGetHistory();
+    }
+  }, [contractVoucher]);
 
   return (
-    <div className="table-responsive">
-      <table className="table table-bordered table-hover">
-        <thead className="table-light">
+    <div className="container py-4 text-light bg-dark min-vh-100">
+      <h5 className="mb-3">📜 Lịch sử hoạt động (Event Logs)</h5>
+      <table className="table table-dark table-bordered table-hover">
+        <thead className="table-light text-dark">
           <tr>
-            <th>Thời gian</th>
-            <th>Sự kiện</th>
             <th>Token ID</th>
-            <th>Giá (ETH)</th>
-            <th>Tài khoản</th>
+            <th>Tên sự kiện</th>
+            <th>Địa chỉ thực hiện</th>
+            <th>Giá</th>
+            <th>TransactionHash</th>
           </tr>
         </thead>
         <tbody>
-          {events.map((event, index) => {
-            const { type, tokenId, price, account, timestamp } = event;
-
-            let eventLabel = "";
-            switch (type) {
-              case "Create":
-                eventLabel = "Tạo voucher";
-                break;
-              case "Sell":
-                eventLabel = "Bán voucher";
-                break;
-              case "Resell":
-                eventLabel = "Bán lại voucher";
-                break;
-              case "Apply":
-                eventLabel = "Áp dụng / Đốt voucher";
-                break;
-              default:
-                eventLabel = "Sự kiện không xác định";
-            }
-
-            return (
-              <tr key={index}>
-                <td>{timestamp || "-"}</td>
-                <td>{eventLabel}</td>
-                <td>#{tokenId}</td>
-                <td>{price ? `${price} ETH` : "-"}</td>
-                <td>{account ? account : "-"}</td>
-              </tr>
-            );
-          })}
+          {history.map((event, index) => (
+            <tr key={index}>
+              <td>{event.args[0]}</td>
+              <td>
+                <span className={`badge bg-${getBadgeColor(event.event)}`}>
+                  {event.event}
+                </span>
+              </td>
+              <td>{event.args[1]}</td>
+              <td>{ethers.formatEther(event.args[2])} ETH</td>
+              <td>
+                <a
+                  href={`https://etherscan.io/tx/${event.txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-warning"
+                >
+                  {shortenAddr(event.txHash)}
+                </a>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
   );
 };
+function getBadgeColor(type) {
+  switch (type) {
+    case "MarketItemCreated":
+      return "primary";
+    case "BUVoucherPurchasedY":
+      return "success";
+    case "VoucherReselled":
+      return "info";
+    case "VoucherUsed":
+      return "danger";
+    default:
+      return "secondary";
+  }
+}
 
 export default EventHistory;

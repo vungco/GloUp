@@ -13,6 +13,7 @@ import { useEthersProvider } from "../../../contexts/EtherContext";
 import CheckInstall from "../../../components/share/Ethers/CheckInstall";
 import { checkwalletInstall } from "../../../utils/checkwallet";
 import CheckConnected from "../../../components/share/Ethers/CheckInsConnect";
+import SelectVoucher from "./SelectVoucher";
 
 function Pay({ getcarts }) {
   const { isConnected } = useAppKitAccount();
@@ -26,13 +27,15 @@ function Pay({ getcarts }) {
   const [voucherAmount, setvoucherAmount] = useState(0);
   const [finalAmount, setfinalAmount] = useState(0);
 
-  const { contract } = useEthersProvider() || {};
+  const { contractOrder, contractVoucher } = useEthersProvider() || {};
   const [loading, setLoading] = useState(false);
   const [txhash, settxhash] = useState();
+  const [showFormVoucher, setshowFormVoucher] = useState(false);
+  const [voucher, setvoucher] = useState(null);
 
   useEffect(() => {
     setIsMetamaskInstalled(checkwalletInstall());
-    console.log(contract);
+    console.log(contractOrder);
   }, []);
 
   //   lấy giá eth hiện tại
@@ -44,6 +47,10 @@ function Pay({ getcarts }) {
     };
     GetEth_vnd();
   }, []);
+
+  const onCloseFormVoucher = () => {
+    setshowFormVoucher(false);
+  };
 
   //   thực hiện chuyển đổi vnđ => wei
   function formatToWei(vndAmount) {
@@ -73,7 +80,20 @@ function Pay({ getcarts }) {
   }, [carts]);
 
   useEffect(() => {
-    setfinalAmount(sumtotalmoney - voucherAmount);
+    if (voucher) {
+      setvoucherAmount(voucher.discountValue);
+    }
+  }, [voucher]);
+
+  useEffect(() => {
+    if (ethPriceVnd && sumtotalmoney && voucherAmount) {
+      const price = sumtotalmoney / ethPriceVnd - voucherAmount;
+      if (price < 0) {
+        setfinalAmount(0);
+      } else {
+        setfinalAmount(price);
+      }
+    }
   }, [sumtotalmoney, voucherAmount]);
 
   const ToThanks = () => {
@@ -85,17 +105,19 @@ function Pay({ getcarts }) {
     setsumtotalmoney(total);
   }
 
-  const handleOrderContract = async () => {
+  const handleOrder = async () => {
     try {
       setLoading(true);
 
+      // 1. Upload dữ liệu
       const data_carts = JSON.stringify(carts);
       const data_receiver = JSON.stringify(receiver);
       const hash_carts = await uploadToPinata(data_carts);
       const hash_receiver = await uploadToPinata(data_receiver);
 
-      const txResponse = await contract.createOrder(
-        voucherAmount,
+      // 2. Gọi createOrder (gửi ETH)
+      const txResponse = await contractOrder.createOrder(
+        ethers.parseEther(voucherAmount.toString()),
         formatToWei(finalAmount),
         hash_receiver,
         hash_carts,
@@ -105,14 +127,24 @@ function Pay({ getcarts }) {
       );
       settxhash(txResponse.hash);
       await txResponse.wait();
+
+      // 3. Nếu có voucher, gọi applyVoucher
+      if (voucher?.tokenId) {
+        const burnTx = await contractVoucher.applyVoucher(voucher.tokenId);
+        await burnTx.wait();
+      }
+
+      // 4. Điều hướng sau khi hoàn tất
+      console.log("IPFS hashes:", hash_carts, hash_receiver);
       ToThanks();
-      console.log(hash_carts, "-", hash_receiver);
     } catch (error) {
-      alert("có lỗi trong quá trình thực hiện");
+      alert("Có lỗi trong quá trình thực hiện");
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <>
       {!isMetamaskInstalled && <CheckInstall />}
@@ -190,7 +222,22 @@ function Pay({ getcarts }) {
                   >
                     <p className="m-0">Thanh toán trực tiếp bằng ví Metamask</p>
                   </div>
-
+                  <div class="mt-3">
+                    <label>Chọn Voucher</label>
+                    <button onClick={() => setshowFormVoucher(true)}>
+                      Voucher Shop{" "}
+                    </button>
+                    {showFormVoucher && (
+                      <>
+                        <div className="overlay1 active"></div>
+                        <SelectVoucher
+                          setvoucher={setvoucher}
+                          onClose={onCloseFormVoucher}
+                          voucher={voucher}
+                        />
+                      </>
+                    )}
+                  </div>
                   {loading && (
                     <div
                       className="alert alert-info d-flex align-items-center gap-2 mt-3"
@@ -264,11 +311,13 @@ function Pay({ getcarts }) {
                 >
                   <div className="d-flex align-items-center justify-content-between ">
                     <p>Tạm tính</p>
-                    <p>{sumtotalmoney}</p>
+                    <p>
+                      {sumtotalmoney} ~ {sumtotalmoney / ethPriceVnd} ETH{" "}
+                    </p>
                   </div>
                   <div className="d-flex align-items-center justify-content-between">
                     <p>Voucher áp dụng</p>
-                    <p>{voucherAmount} đ</p>
+                    <p>{voucherAmount} ETH</p>
                   </div>
                 </div>
                 <div className="d-flex align-items-center justify-content-between mt-2">
@@ -289,7 +338,7 @@ function Pay({ getcarts }) {
                     Quay về giỏ hàng
                   </Link>
                   <button
-                    onClick={handleOrderContract}
+                    onClick={handleOrder}
                     style={{
                       width: "100px",
                       height: "40px",

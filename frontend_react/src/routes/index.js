@@ -11,7 +11,8 @@ import Receiver from "../pages/User/Receiver";
 import Order from "../pages/User/Order";
 import OrderDetail from "../pages/User/Order_detail";
 import Voucher from "../pages/User/Voucher";
-import Voucher_detail from "../pages/User/Voucher/NFTCard_detail";
+import NFTCartDetail_sell from "../pages/User/Voucher/NFTCartDetail_sell";
+import NFTCartDetail_resell from "../pages/User/Voucher/NFTCartDetail_resell";
 import Thankyou from "../pages/User/Thankyou";
 import AdHome from "../pages/Admin/Home";
 import admin from "../components/Layout/Admin";
@@ -71,8 +72,12 @@ const publicRoutes = [
     component: Voucher,
   },
   {
-    path: "/Voucher/:tokenId",
-    component: Voucher_detail,
+    path: "/Voucher/:tokenId/sell",
+    component: NFTCartDetail_sell,
+  },
+  {
+    path: "/Voucher/:tokenId/resell",
+    component: NFTCartDetail_resell,
   },
   {
     path: "/OrderDetail/:id",

@@ -1,0 +1,8 @@
+.bg-purple {
+  background: linear-gradient(135deg, #6f42c1, #9b59b6);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px rgba(130, 0, 255, 0.2);
+}

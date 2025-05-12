@@ -13,41 +13,73 @@ const ORDER_STATUS = {
   1: "Confirmed",
   2: "Cancelled",
   3: "Shipping",
-  3: "Successful",
+  4: "Successful",
 };
 
 const Order = () => {
   const [isMetamaskInstalled] = useState(true);
   const { isConnected, address } = useAppKitAccount();
-  const { contract } = useEthersProvider() || {};
-
+  const { contractOrder, ethersProvider } = useEthersProvider() || {};
   const [orders, setorders] = useState();
   const [selectedStatus, setselectedStatus] = useState("");
   const navigate = useNavigate();
+  const [contractBalance, setContractBalance] = useState("0");
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   useEffect(() => {
-    if (contract) {
+    if (contractOrder && ethersProvider) {
+      fetchBalance();
+    }
+  }, [ethersProvider, contractOrder]);
+
+  useEffect(() => {
+    if (contractOrder) {
       getOrders();
     }
-  }, [contract]);
+  }, [contractOrder]);
+
+  const fetchBalance = async () => {
+    if (!ethersProvider || !contractOrder) return;
+    const contractAddr = await contractOrder.getAddress();
+    const balance = await ethersProvider.getBalance(contractAddr);
+    setContractBalance(ethers.formatEther(balance));
+  };
+
+  const handleWithdraw = async () => {
+    if (!contractOrder) return;
+    try {
+      setIsWithdrawing(true);
+      const tx = await contractOrder.withdraw(); // <- đảm bảo hàm này có trong smart contract
+      await tx.wait();
+      fetchBalance(); // cập nhật lại số dư
+      alert("Rút tiền thành công!");
+    } catch (err) {
+      console.error("Withdraw failed", err);
+      alert("Rút tiền thất bại.");
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
 
   const getOrdersByStatus = async (status) => {
     try {
-      const orders = await contract.getOrdersByStatus(status);
+      const orders = await contractOrder.getOrdersByStatus(status);
 
       setorders(clenOrder(orders));
     } catch (error) {
       alert("address ko hợp lệ hoặc có lỗi");
+      console.error(error);
     }
   };
 
   const getOrders = async () => {
     try {
-      const orders = await contract.getAllOrders();
+      const orders = await contractOrder.getAllOrders();
 
       setorders(clenOrder(orders));
     } catch (error) {
       alert("address ko hợp lệ hoặc có lỗi");
+      console.error(error);
     }
   };
 
@@ -75,6 +107,19 @@ const Order = () => {
 
       {isMetamaskInstalled && isConnected && (
         <div class="container my-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <strong>Số dư hợp đồng:</strong> {contractBalance} ETH
+            </div>
+            <button
+              className="btn btn-danger"
+              onClick={handleWithdraw}
+              disabled={isWithdrawing}
+            >
+              {isWithdrawing ? "Đang rút..." : "💸 Rút tiền"}
+            </button>
+          </div>
+
           <h2>Danh sách đơn hàng</h2>
 
           <form class="mb-3">

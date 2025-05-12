@@ -8,15 +8,15 @@ import "./App.css";
 import { CartProvider } from "./contexts/CartContext";
 import { EthersProvider } from "./contexts/EtherContext";
 
-//  import Appkit
+//  import Appkit với sepolia testnet
 import { createAppKit } from "@reown/appkit/react";
-import { sepolia } from "@reown/appkit/networks";
+import { sepolia, anvil } from "@reown/appkit/networks";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
 import { METAMASK_WCONNECT_ID } from "./config";
 
 createAppKit({
   adapters: [new EthersAdapter()],
-  networks: [sepolia],
+  networks: [sepolia, anvil],
   metadata: {
     name: "My Website",
     description: "My Website description",

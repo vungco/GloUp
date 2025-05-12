@@ -18,17 +18,17 @@ const ORDER_STATUS = {
 const Order = () => {
   const [isMetamaskInstalled] = useState(true);
   const { isConnected, address } = useAppKitAccount();
-  const { contract } = useEthersProvider() || {};
+  const { contractOrder } = useEthersProvider() || {};
 
   const [orders, setorders] = useState();
   const [inputAddress, setinputAddress] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (contract) {
+    if (contractOrder) {
       getOrdersOfByner(address);
     }
-  }, [contract]);
+  }, [contractOrder]);
 
   function formatBlockchainTimestamp(tsBN) {
     const ts =
@@ -38,7 +38,7 @@ const Order = () => {
 
   const getOrdersOfByner = async (address) => {
     try {
-      const orders = await contract.getOrdersByBuyer(address);
+      const orders = await contractOrder.getOrdersByBuyer(address);
       const realOrders = Array.from(orders);
       const cleanOrders = orders.map((order) => ({
         id: order.id.toString(),
