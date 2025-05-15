@@ -10,7 +10,7 @@ const NFTCartDetail_resell = () => {
   const { tokenId } = useParams();
   const { state } = useLocation();
   const voucher = state?.voucher;
-  const { contract } = useEthersProvider() || {};
+  const { contractVoucher } = useEthersProvider() || {};
 
   const [loading, setLoading] = useState(false);
   const [txhash, settxhash] = useState();
@@ -28,7 +28,7 @@ const NFTCartDetail_resell = () => {
 
     try {
       setLoading(true);
-      const txResponse = await contract.resellToken(
+      const txResponse = await contractVoucher.resellToken(
         tokenId,
         ethers.parseEther(newprice),
         {

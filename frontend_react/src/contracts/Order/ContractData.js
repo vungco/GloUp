@@ -1,4 +1,4 @@
-export const contractOrderAddr = "0x5CBcf25FfaE1cE582685628fcf6F6df12a58EedB";
+export const contractOrderAddr = "0x9b4d9F9F99a94b2211605ADB39DB9baB4a71A5c5";
 
 export const contractOrderABI = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },

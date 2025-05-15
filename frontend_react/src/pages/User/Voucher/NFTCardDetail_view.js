@@ -27,7 +27,7 @@ const VoucherCardDetail = ({
           </a>
         </div>
       )}
-      <div className="row g-4">
+      <div className="row g-4 mt-3">
         {/* MEDIA */}
         <div className="col-md-6">
           {voucher.type === "video" ? (
