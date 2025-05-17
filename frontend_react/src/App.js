@@ -10,13 +10,13 @@ import { EthersProvider } from "./contexts/EtherContext";
 
 //  import Appkit với sepolia testnet
 import { createAppKit } from "@reown/appkit/react";
-import { sepolia, anvil } from "@reown/appkit/networks";
+import { sepolia, anvil, arbitrumSepolia } from "@reown/appkit/networks";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
 import { METAMASK_WCONNECT_ID } from "./config";
 
 createAppKit({
   adapters: [new EthersAdapter()],
-  networks: [sepolia, anvil],
+  networks: [sepolia, anvil, arbitrumSepolia],
   metadata: {
     name: "My Website",
     description: "My Website description",

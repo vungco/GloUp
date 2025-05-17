@@ -1,0 +1,27 @@
+type OrderCreated @entity(immutable: true) {
+  id: Bytes!
+  orderId: BigInt! # uint256
+  buyer: Bytes! # address
+  timestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OrderStatusUpdated @entity(immutable: true) {
+  id: Bytes!
+  orderId: BigInt! # uint256
+  newStatus: Int! # uint8
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Withdraw @entity(immutable: true) {
+  id: Bytes!
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

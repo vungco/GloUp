@@ -10,18 +10,13 @@ dataSources:
     source:
       address: "0x309Aa88639413E18CE743aa1dAe6c3135aD98531"
       abi: VoucherNFT
-      startBlock: 153076623
+      startBlock: 153155000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - BatchMetadataUpdate
         - MarketItemCreated
-        - MetadataUpdate
-        - OwnershipTransferred
         - Transfer
         - VoucherPurchased
         - VoucherReselled
@@ -30,18 +25,8 @@ dataSources:
         - name: VoucherNFT
           file: ./abis/VoucherNFT.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: BatchMetadataUpdate(uint256,uint256)
-          handler: handleBatchMetadataUpdate
         - event: MarketItemCreated(indexed uint256,indexed address,uint256,uint256)
           handler: handleMarketItemCreated
-        - event: MetadataUpdate(uint256)
-          handler: handleMetadataUpdate
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
         - event: VoucherPurchased(indexed uint256,indexed address,uint256)

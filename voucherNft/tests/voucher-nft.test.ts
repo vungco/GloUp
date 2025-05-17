@@ -4,59 +4,48 @@ import {
   test,
   clearStore,
   beforeAll,
-  afterAll
-} from "matchstick-as/assembly/index"
-import { Address, BigInt } from "@graphprotocol/graph-ts"
-import { Approval } from "../generated/schema"
-import { Approval as ApprovalEvent } from "../generated/VoucherNFT/VoucherNFT"
-import { handleApproval } from "../src/voucher-nft"
-import { createApprovalEvent } from "./voucher-nft-utils"
+  afterAll,
+} from "matchstick-as/assembly/index";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { handleMarketItemCreated } from "../src/voucher-nft";
+import { createMarketItemCreatedEvent } from "./voucher-nft-utils";
 
-// Tests structure (matchstick-as >=0.5.0)
-// https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
-
-describe("Describe entity assertions", () => {
+describe("MarketItemCreated event handler", () => {
   beforeAll(() => {
-    let owner = Address.fromString("0x0000000000000000000000000000000000000001")
-    let approved = Address.fromString(
-      "0x0000000000000000000000000000000000000001"
-    )
-    let tokenId = BigInt.fromI32(234)
-    let newApprovalEvent = createApprovalEvent(owner, approved, tokenId)
-    handleApproval(newApprovalEvent)
-  })
+    let tokenId = BigInt.fromI32(1);
+    let creator = Address.fromString(
+      "0x00000000000000000000000000000000000000ab"
+    );
+    let price = BigInt.fromI32(1000);
+    let discountValue = BigInt.fromI32(100);
+
+    let event = createMarketItemCreatedEvent(
+      tokenId,
+      creator,
+      price,
+      discountValue
+    );
+    handleMarketItemCreated(event);
+  });
 
   afterAll(() => {
-    clearStore()
-  })
+    clearStore();
+  });
 
-  // For more test scenarios, see:
-  // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
+  test("MarketItemCreated entity saved correctly", () => {
+    assert.entityCount("MarketItemCreated", 1);
 
-  test("Approval created and stored", () => {
-    assert.entityCount("Approval", 1)
+    // default mock address is always: 0xa16081f360e3847006db660bae1c6d1b2e17ec2a
+    let id = "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-0";
 
-    // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
+    assert.fieldEquals("MarketItemCreated", id, "tokenId", "1");
     assert.fieldEquals(
-      "Approval",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "owner",
-      "0x0000000000000000000000000000000000000001"
-    )
-    assert.fieldEquals(
-      "Approval",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "approved",
-      "0x0000000000000000000000000000000000000001"
-    )
-    assert.fieldEquals(
-      "Approval",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "tokenId",
-      "234"
-    )
-
-    // More assert options:
-    // https://thegraph.com/docs/en/developer/matchstick/#asserts
-  })
-})
+      "MarketItemCreated",
+      id,
+      "creator",
+      "0x00000000000000000000000000000000000000ab"
+    );
+    assert.fieldEquals("MarketItemCreated", id, "price", "1000");
+    assert.fieldEquals("MarketItemCreated", id, "discountValue", "100");
+  });
+});
