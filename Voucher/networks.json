@@ -1,0 +1,8 @@
+{
+  "arbitrum-sepolia": {
+    "VoucherNFT": {
+      "address": "0x3934e817FD7653e296faE3499E37167876c9Df29",
+      "startBlock": 154181083
+    }
+  }
+}

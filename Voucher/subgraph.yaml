@@ -1,0 +1,56 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: VoucherNFT
+    network: arbitrum-sepolia
+    source:
+      address: "0x3934e817FD7653e296faE3499E37167876c9Df29"
+      abi: VoucherNFT
+      startBlock: 154181083
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - BatchMetadataUpdate
+        - ListingPriceUpdated
+        - MetadataUpdate
+        - OwnershipTransferred
+        - Transfer
+        - VoucherCreated
+        - VoucherReselled
+        - VoucherSold
+        - VoucherUsed
+      abis:
+        - name: VoucherNFT
+          file: ./abis/VoucherNFT.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: BatchMetadataUpdate(uint256,uint256)
+          handler: handleBatchMetadataUpdate
+        - event: ListingPriceUpdated(uint256)
+          handler: handleListingPriceUpdated
+        - event: MetadataUpdate(uint256)
+          handler: handleMetadataUpdate
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: VoucherCreated(indexed uint256,indexed address,string,uint256,uint256,uint256)
+          handler: handleVoucherCreated
+        - event: VoucherReselled(indexed uint256,indexed address,uint256,uint256)
+          handler: handleVoucherReselled
+        - event: VoucherSold(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handleVoucherSold
+        - event: VoucherUsed(indexed uint256,indexed address,uint256,uint256)
+          handler: handleVoucherUsed
+      file: ./src/voucher-nft.ts
