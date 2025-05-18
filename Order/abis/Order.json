@@ -18,6 +18,30 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "voucherAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "finalAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "inforUserCID",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "orderDetailCID",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
       }
@@ -35,10 +59,22 @@
         "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "updatedBy",
+        "type": "address"
+      },
+      {
         "indexed": false,
         "internalType": "enum Order.OrderStatus",
         "name": "newStatus",
         "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "name": "OrderStatusUpdated",
@@ -58,9 +94,15 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
-    "name": "Withdraw",
+    "name": "Withdrawn",
     "type": "event"
   },
   {
@@ -114,7 +156,7 @@
             "type": "uint8"
           }
         ],
-        "internalType": "struct Order.Order[]",
+        "internalType": "struct Order.Str_Order[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -159,7 +201,7 @@
             "type": "uint8"
           }
         ],
-        "internalType": "struct Order.Order",
+        "internalType": "struct Order.Str_Order",
         "name": "",
         "type": "tuple"
       }
@@ -204,7 +246,7 @@
             "type": "uint8"
           }
         ],
-        "internalType": "struct Order.Order[]",
+        "internalType": "struct Order.Str_Order[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -253,7 +295,7 @@
             "type": "uint8"
           }
         ],
-        "internalType": "struct Order.Order[]",
+        "internalType": "struct Order.Str_Order[]",
         "name": "",
         "type": "tuple[]"
       }

@@ -19,10 +19,18 @@ describe("Describe entity assertions", () => {
   beforeAll(() => {
     let orderId = BigInt.fromI32(234)
     let buyer = Address.fromString("0x0000000000000000000000000000000000000001")
+    let voucherAmount = BigInt.fromI32(234)
+    let finalAmount = BigInt.fromI32(234)
+    let inforUserCID = "Example string value"
+    let orderDetailCID = "Example string value"
     let timestamp = BigInt.fromI32(234)
     let newOrderCreatedEvent = createOrderCreatedEvent(
       orderId,
       buyer,
+      voucherAmount,
+      finalAmount,
+      inforUserCID,
+      orderDetailCID,
       timestamp
     )
     handleOrderCreated(newOrderCreatedEvent)
@@ -50,6 +58,30 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "buyer",
       "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "OrderCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "voucherAmount",
+      "234"
+    )
+    assert.fieldEquals(
+      "OrderCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "finalAmount",
+      "234"
+    )
+    assert.fieldEquals(
+      "OrderCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "inforUserCID",
+      "Example string value"
+    )
+    assert.fieldEquals(
+      "OrderCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "orderDetailCID",
+      "Example string value"
     )
     assert.fieldEquals(
       "OrderCreated",

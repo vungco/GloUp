@@ -1,9 +1,13 @@
 import {
   OrderCreated as OrderCreatedEvent,
   OrderStatusUpdated as OrderStatusUpdatedEvent,
-  Withdraw as WithdrawEvent
+  Withdrawn as WithdrawnEvent
 } from "../generated/Order/Order"
-import { OrderCreated, OrderStatusUpdated, Withdraw } from "../generated/schema"
+import {
+  OrderCreated,
+  OrderStatusUpdated,
+  Withdrawn
+} from "../generated/schema"
 
 export function handleOrderCreated(event: OrderCreatedEvent): void {
   let entity = new OrderCreated(
@@ -11,6 +15,10 @@ export function handleOrderCreated(event: OrderCreatedEvent): void {
   )
   entity.orderId = event.params.orderId
   entity.buyer = event.params.buyer
+  entity.voucherAmount = event.params.voucherAmount
+  entity.finalAmount = event.params.finalAmount
+  entity.inforUserCID = event.params.inforUserCID
+  entity.orderDetailCID = event.params.orderDetailCID
   entity.timestamp = event.params.timestamp
 
   entity.blockNumber = event.block.number
@@ -25,7 +33,9 @@ export function handleOrderStatusUpdated(event: OrderStatusUpdatedEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.orderId = event.params.orderId
+  entity.updatedBy = event.params.updatedBy
   entity.newStatus = event.params.newStatus
+  entity.timestamp = event.params.timestamp
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -34,12 +44,13 @@ export function handleOrderStatusUpdated(event: OrderStatusUpdatedEvent): void {
   entity.save()
 }
 
-export function handleWithdraw(event: WithdrawEvent): void {
-  let entity = new Withdraw(
+export function handleWithdrawn(event: WithdrawnEvent): void {
+  let entity = new Withdrawn(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.to = event.params.to
   entity.amount = event.params.amount
+  entity.timestamp = event.params.timestamp
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

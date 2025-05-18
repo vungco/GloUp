@@ -3,12 +3,16 @@ import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts"
 import {
   OrderCreated,
   OrderStatusUpdated,
-  Withdraw
+  Withdrawn
 } from "../generated/Order/Order"
 
 export function createOrderCreatedEvent(
   orderId: BigInt,
   buyer: Address,
+  voucherAmount: BigInt,
+  finalAmount: BigInt,
+  inforUserCID: string,
+  orderDetailCID: string,
   timestamp: BigInt
 ): OrderCreated {
   let orderCreatedEvent = changetype<OrderCreated>(newMockEvent())
@@ -26,6 +30,30 @@ export function createOrderCreatedEvent(
   )
   orderCreatedEvent.parameters.push(
     new ethereum.EventParam(
+      "voucherAmount",
+      ethereum.Value.fromUnsignedBigInt(voucherAmount)
+    )
+  )
+  orderCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "finalAmount",
+      ethereum.Value.fromUnsignedBigInt(finalAmount)
+    )
+  )
+  orderCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "inforUserCID",
+      ethereum.Value.fromString(inforUserCID)
+    )
+  )
+  orderCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "orderDetailCID",
+      ethereum.Value.fromString(orderDetailCID)
+    )
+  )
+  orderCreatedEvent.parameters.push(
+    new ethereum.EventParam(
       "timestamp",
       ethereum.Value.fromUnsignedBigInt(timestamp)
     )
@@ -36,7 +64,9 @@ export function createOrderCreatedEvent(
 
 export function createOrderStatusUpdatedEvent(
   orderId: BigInt,
-  newStatus: i32
+  updatedBy: Address,
+  newStatus: i32,
+  timestamp: BigInt
 ): OrderStatusUpdated {
   let orderStatusUpdatedEvent = changetype<OrderStatusUpdated>(newMockEvent())
 
@@ -49,26 +79,45 @@ export function createOrderStatusUpdatedEvent(
     )
   )
   orderStatusUpdatedEvent.parameters.push(
+    new ethereum.EventParam("updatedBy", ethereum.Value.fromAddress(updatedBy))
+  )
+  orderStatusUpdatedEvent.parameters.push(
     new ethereum.EventParam(
       "newStatus",
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(newStatus))
+    )
+  )
+  orderStatusUpdatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
     )
   )
 
   return orderStatusUpdatedEvent
 }
 
-export function createWithdrawEvent(to: Address, amount: BigInt): Withdraw {
-  let withdrawEvent = changetype<Withdraw>(newMockEvent())
+export function createWithdrawnEvent(
+  to: Address,
+  amount: BigInt,
+  timestamp: BigInt
+): Withdrawn {
+  let withdrawnEvent = changetype<Withdrawn>(newMockEvent())
 
-  withdrawEvent.parameters = new Array()
+  withdrawnEvent.parameters = new Array()
 
-  withdrawEvent.parameters.push(
+  withdrawnEvent.parameters.push(
     new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
   )
-  withdrawEvent.parameters.push(
+  withdrawnEvent.parameters.push(
     new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
   )
+  withdrawnEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
+    )
+  )
 
-  return withdrawEvent
+  return withdrawnEvent
 }
