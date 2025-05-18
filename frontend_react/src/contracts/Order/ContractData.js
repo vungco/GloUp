@@ -1,4 +1,4 @@
-export const contractOrderAddr = "0x9b4d9F9F99a94b2211605ADB39DB9baB4a71A5c5";
+export const contractOrderAddr = "0xABeb8EB8aa7876c9Cff2f1a4b772495862636746";
 
 export const contractOrderABI = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -20,6 +20,30 @@ export const contractOrderABI = [
       {
         indexed: false,
         internalType: "uint256",
+        name: "voucherAmount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "finalAmount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "inforUserCID",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "orderDetailCID",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
         name: "timestamp",
         type: "uint256",
       },
@@ -37,10 +61,22 @@ export const contractOrderABI = [
         type: "uint256",
       },
       {
+        indexed: true,
+        internalType: "address",
+        name: "updatedBy",
+        type: "address",
+      },
+      {
         indexed: false,
         internalType: "enum Order.OrderStatus",
         name: "newStatus",
         type: "uint8",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
       },
     ],
     name: "OrderStatusUpdated",
@@ -56,8 +92,14 @@ export const contractOrderABI = [
         name: "amount",
         type: "uint256",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
-    name: "Withdraw",
+    name: "Withdrawn",
     type: "event",
   },
   {
@@ -91,7 +133,7 @@ export const contractOrderABI = [
             type: "uint8",
           },
         ],
-        internalType: "struct Order.Order[]",
+        internalType: "struct Order.Str_Order[]",
         name: "",
         type: "tuple[]",
       },
@@ -118,7 +160,7 @@ export const contractOrderABI = [
             type: "uint8",
           },
         ],
-        internalType: "struct Order.Order",
+        internalType: "struct Order.Str_Order",
         name: "",
         type: "tuple",
       },
@@ -145,7 +187,7 @@ export const contractOrderABI = [
             type: "uint8",
           },
         ],
-        internalType: "struct Order.Order[]",
+        internalType: "struct Order.Str_Order[]",
         name: "",
         type: "tuple[]",
       },
@@ -178,7 +220,7 @@ export const contractOrderABI = [
             type: "uint8",
           },
         ],
-        internalType: "struct Order.Order[]",
+        internalType: "struct Order.Str_Order[]",
         name: "",
         type: "tuple[]",
       },

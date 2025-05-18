@@ -7,7 +7,7 @@ import receiverApi from "../../../api/receiverApi";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { shortenAddr } from "../../../utils/shortAddress";
 import { getEthAmountFromVnd } from "../../../utils/getEthFromVnd";
-import { ethers } from "ethers";
+import { ethers, parseEther } from "ethers";
 import { uploadToPinata } from "../../../utils/uploadIpfs";
 import { useEthersProvider } from "../../../contexts/EtherContext";
 import CheckInstall from "../../../components/share/Ethers/CheckInstall";
@@ -86,7 +86,7 @@ function Pay({ getcarts }) {
   }, [voucher]);
 
   useEffect(() => {
-    if (ethPriceVnd && sumtotalmoney && voucherAmount) {
+    if (ethPriceVnd && sumtotalmoney) {
       const price = sumtotalmoney / ethPriceVnd - voucherAmount;
       if (price < 0) {
         setfinalAmount(0);
@@ -94,7 +94,7 @@ function Pay({ getcarts }) {
         setfinalAmount(price);
       }
     }
-  }, [sumtotalmoney, voucherAmount]);
+  }, [sumtotalmoney, voucherAmount, ethPriceVnd]);
 
   const ToThanks = () => {
     navigate("/Thankyou"); // Chuyển đến trang Pay
@@ -108,6 +108,10 @@ function Pay({ getcarts }) {
   const handleOrder = async () => {
     try {
       setLoading(true);
+      const vc_amount = 0;
+      if (voucherAmount !== 0) {
+        vc_amount = ethers.parseEther(voucherAmount.toString());
+      }
 
       // 1. Upload dữ liệu
       const data_carts = JSON.stringify(carts);
@@ -117,12 +121,12 @@ function Pay({ getcarts }) {
 
       // 2. Gọi createOrder (gửi ETH)
       const txResponse = await contractOrder.createOrder(
-        ethers.parseEther(voucherAmount.toString()),
-        formatToWei(finalAmount),
+        vc_amount,
+        ethers.parseEther(finalAmount.toFixed(6).toString()),
         hash_receiver,
         hash_carts,
         {
-          value: formatToWei(finalAmount),
+          value: ethers.parseEther(finalAmount.toFixed(6).toString()),
         }
       );
       settxhash(txResponse.hash);
@@ -329,7 +333,7 @@ function Pay({ getcarts }) {
                 <div className="d-flex align-items-center justify-content-between mt-2">
                   <p>~</p>
                   <p style={{ color: "#d69c52", fontSize: "24px" }}>
-                    {ethPriceVnd && finalAmount / ethPriceVnd} ETH
+                    {ethPriceVnd && finalAmount} ETH
                   </p>
                 </div>
                 <div className="d-flex align-items-center justify-content-between mt-2">

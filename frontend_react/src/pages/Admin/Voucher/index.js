@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEthersProvider } from "../../../contexts/EtherContext";
@@ -7,8 +7,8 @@ import { shortenAddr } from "../../../utils/shortAddress";
 import { ethers, Interface } from "ethers";
 
 const myCustomEvents = [
-  "MarketItemCreated",
-  "VoucherPurchased",
+  "VoucherCreated",
+  "VoucherSold",
   "VoucherReselled",
   "VoucherUsed",
 ];
@@ -37,7 +37,7 @@ function VoucherNft() {
 
       const logs = await ethersProvider.getLogs({
         address: contractAddress.toLowerCase(),
-        fromBlock: 0,
+        fromBlock: 154181083,
         toBlock: "latest",
       });
 
@@ -59,10 +59,14 @@ function VoucherNft() {
           (log) => log && myCustomEvents.includes(log.event) // chỉ giữ event mình định nghĩa
         );
       sethistory(decoded);
+      console.log("Contract address:", contractAddress);
+      console.log("Số lượng logs thu được:", logs.length);
+      console.log("Logs mẫu:", logs);
     } catch (error) {
       alert("có lỗi trong quá trình thực hiện");
       console.error(error);
     } finally {
+      console.log(history);
     }
   };
 
@@ -109,28 +113,30 @@ function VoucherNft() {
           </tr>
         </thead>
         <tbody>
-          {history.map((event, index) => (
-            <tr key={index}>
-              <td>{event.args[0]}</td>
-              <td>
-                <span className={`badge bg-${getBadgeColor(event.event)}`}>
-                  {event.event}
-                </span>
-              </td>
-              <td>{event.args[1]}</td>
-              <td>{ethers.formatEther(event.args[2])} ETH</td>
-              <td>
-                <a
-                  href={`https://etherscan.io/tx/${event.txHash}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-warning"
-                >
-                  {shortenAddr(event.txHash)}
-                </a>
-              </td>
-            </tr>
-          ))}
+          {/* {history &&
+            history.map((event, index) => (
+              <tr key={index}>
+                <td>{event.args[0]}</td>
+                <td>
+                  <span className={`badge bg-${getBadgeColor(event.event)}`}>
+                    {event.event}
+                  </span>
+                </td>
+                <td>{event.args[1]}</td>
+                <td>{ethers.formatEther(event.args[2])} ETH</td>
+                <td>
+                  <a
+                    href={`https://etherscan.io/tx/${event.txHash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-warning"
+                  >
+                    {shortenAddr(event.txHash)}
+                  </a>
+                </td>
+              </tr>
+            ))
+          } */}
         </tbody>
       </table>
     </div>
@@ -138,9 +144,9 @@ function VoucherNft() {
 }
 function getBadgeColor(type) {
   switch (type) {
-    case "MarketItemCreated":
+    case "VoucherCreated":
       return "primary";
-    case "BUVoucherPurchasedY":
+    case "VoucherSold":
       return "success";
     case "VoucherReselled":
       return "info";

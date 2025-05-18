@@ -27,7 +27,6 @@ function CreateVoucherNFT() {
   const handleCreateVoucher = async () => {
     try {
       setLoading(true);
-
       let detail = nft_detail;
       if (file) {
         console.log("File đang xử lý:", file);

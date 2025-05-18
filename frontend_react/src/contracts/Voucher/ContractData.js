@@ -1,4 +1,4 @@
-export const contractVoucherAddr = "0x309Aa88639413E18CE743aa1dAe6c3135aD98531";
+export const contractVoucherAddr = "0x3934e817FD7653e296faE3499E37167876c9Df29";
 
 export const contractVoucherABI = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -127,31 +127,13 @@ export const contractVoucherABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "creator",
-        type: "address",
-      },
-      {
         indexed: false,
         internalType: "uint256",
-        name: "price",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "discountValue",
+        name: "newPrice",
         type: "uint256",
       },
     ],
-    name: "MarketItemCreated",
+    name: "ListingPriceUpdated",
     type: "event",
   },
   {
@@ -213,8 +195,14 @@ export const contractVoucherABI = [
       {
         indexed: true,
         internalType: "address",
-        name: "buyer",
+        name: "creator",
         type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "tokenURI",
+        type: "string",
       },
       {
         indexed: false,
@@ -222,8 +210,20 @@ export const contractVoucherABI = [
         name: "price",
         type: "uint256",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "discountValue",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
-    name: "VoucherPurchased",
+    name: "VoucherCreated",
     type: "event",
   },
   {
@@ -244,11 +244,54 @@ export const contractVoucherABI = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "newPrice",
+        name: "price",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
         type: "uint256",
       },
     ],
     name: "VoucherReselled",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "buyer",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "seller",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "price",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "VoucherSold",
     type: "event",
   },
   {
@@ -265,6 +308,12 @@ export const contractVoucherABI = [
         indexed: false,
         internalType: "uint256",
         name: "discountValue",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
         type: "uint256",
       },
     ],

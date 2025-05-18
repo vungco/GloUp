@@ -36,8 +36,8 @@ export const EthersProvider = ({ children }) => {
         etherPro = new BrowserProvider(walletProvider);
       } else {
         etherPro = new InfuraProvider(
-          "sepolia",
-          "06aca75c4a694d3dae144c59a602541b"
+          "arbitrum-sepolia", // ✅ Tên mạng chính xác
+          "06aca75c4a694d3dae144c59a602541b" // 🔑 Project ID của bạn
         );
       }
 
