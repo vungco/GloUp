@@ -20,7 +20,6 @@ const MarketItems = () => {
   const getVouchers = async () => {
     try {
       const vouchers = await contractVoucher.fetchMarketItems();
-      console.log(vouchers);
 
       const cleanVouchers = await Promise.all(
         vouchers.map(async (voucher) => {
